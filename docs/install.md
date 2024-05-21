@@ -16,6 +16,12 @@ Istio is often [installed with the `istioctl` CLI](https://istio.io/latest/docs/
 
 [`helm`](https://istio.io/latest/docs/setup/install/helm/) is typically the method preferred for QA, staging, and production environments.
 
+Use the Istio CLI to install Istio with the [default configuration profile](https://istio.io/latest/docs/setup/additional-setup/config-profiles/), which deploys `istiod` and the Istio ingress gateway component:
+
+```shell
+istioctl install
+```
+
 ## Is istio installed properly?
 
 Given an environment with Istio installed, we can verify the installation with the [verify-install command](https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-verify-install):

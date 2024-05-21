@@ -1,0 +1,15 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: allowed-reviews-clients
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: reviewss
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: ["cluster.local/ns/default/sa/bookinfo-productpage"]

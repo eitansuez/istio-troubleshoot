@@ -191,3 +191,7 @@ kubectl exec deploy/sleep -- curl httpbin:8000/get
 ```
 
 The command fails with a `Connection reset by peer` error, because there is no forward proxy on `sleep` to upgrade the connection to mutual TLS, which is now a requirement.
+
+## Sidecar injection problems
+
+The Istio docs have a page titled [sidecar injection problems](https://istio.io/latest/docs/ops/common-problems/injection/) that catalogs sidecar injection errors and their remedies.

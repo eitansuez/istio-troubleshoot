@@ -49,7 +49,7 @@ istioctl version
     Part of the output from `istioctl version` is:
 
     ```console
-    data plane version: 1.22.0 (1 proxies)
+    data plane version: 1.21.2 (1 proxies)
     ```
 
     Can you explain what this means?  What proxies are being referred to?
@@ -69,3 +69,5 @@ kubectl apply -f artifacts/install/telemetry.yaml
 ```yaml linenums="1"
 --8<-- "install/telemetry.yaml"
 ```
+
+Note that we also set the tracing provider to zipkin.  More on that later.

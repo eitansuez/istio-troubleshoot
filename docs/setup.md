@@ -39,6 +39,7 @@ And:
 istioctl version
 ```
 
-## TODO
+## Workshop artifacts
 
-Instructions to download artifacts for exercises
+Download all yaml artifacts referenced in all scenarios as a single .tgz file [here](artifacts.tgz).
+

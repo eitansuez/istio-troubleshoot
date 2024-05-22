@@ -8,4 +8,6 @@ spec:
   accessLogging:
   - providers:
     - name: envoy
-
+  tracing:
+  - providers:
+    - name: zipkin

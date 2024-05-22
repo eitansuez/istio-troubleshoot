@@ -19,7 +19,13 @@ Istio is often [installed with the `istioctl` CLI](https://istio.io/latest/docs/
 Use the Istio CLI to install Istio with the [default configuration profile](https://istio.io/latest/docs/setup/additional-setup/config-profiles/), which deploys `istiod` and the Istio ingress gateway component:
 
 ```shell
-istioctl install
+istioctl install -f artifacts/install/trace-config.yaml
+```
+
+Above, we also reference an installation configuration that configures distributed tracing.
+
+```yaml linenums="1"
+--8<-- "install/trace-config.yaml"
 ```
 
 ## Is istio installed properly?
@@ -58,4 +64,8 @@ Apply the following resource to your Kubernetes cluster:
 
 ```shell
 kubectl apply -f artifacts/install/telemetry.yaml
+```
+
+```yaml linenums="1"
+--8<-- "install/telemetry.yaml"
 ```

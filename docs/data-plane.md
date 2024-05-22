@@ -4,8 +4,6 @@ In the previous exploration we looked at issues relating to misconfiguration.
 
 In this exploration, we investigate issues with the data plane:  everything is configured correctly, but some traffic flow isn't functioning, and we need to find out why.
 
-## Ingress
-
 We have ingress configured for the bookinfo application, routing requests to the `productpage` destination.
 
 Assuming the local cluster deployed with k3d in [setup](setup.md#kubernetes), the ingress gateway is reachable on localhost, port 80:
@@ -14,7 +12,7 @@ Assuming the local cluster deployed with k3d in [setup](setup.md#kubernetes), th
 export GATEWAY_IP=localhost
 ```
 
-### No Healthy Upstream (UH)
+## No Healthy Upstream (UH)
 
 What if for some reason the backing workload is not accessible?
 
@@ -46,7 +44,7 @@ Note the UH [response flag](https://www.envoyproxy.io/docs/envoy/latest/configur
 
 These response flags clearly communicate to the operator the reason for which the request did not succeed.
 
-### No Route Found (NR)
+## No Route Found (NR)
 
 As another example, make a request to a route that does not match any routing rules in the virtual service:
 
@@ -60,7 +58,7 @@ The log entry responds with a 404 "NR", for "No Route Found":
 "GET /productpages HTTP/1.1" 404 NR route_not_found - "-" 0 0 0 - "10.42.0.1" "curl/8.7.1" "2606aaa9-8c5c-4987-9ba7-86b89f901d34" "localhost" "-" - - 10.42.0.7:8080 10.42.0.1:13819 - -
 ```
 
-#### UpstreamRetryLimitExceeded (URX)
+## UpstreamRetryLimitExceeded (URX)
 
 Delete the `bookinfo` Gateway and VirtualService resources:
 
@@ -113,3 +111,35 @@ curl http://$GATEWAY_IP/status/503
 ```
 
 You will see four inbound requests received by the sidecar, i.e. 3 retry attempts.
+
+## Log levels
+
+The log level for any Envoy proxy can be either displayed or configured with the [proxy-config log command](https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-proxy-config-log).
+
+Envoy has many loggers.  The log level for each logger can be configured independently.
+
+For example, let us target the Istio ingress gateway deployment.
+
+To view the log levels for each logger, run:
+
+```shell
+istioctl proxy-config log -n istio-system deploy/istio-ingressgateway
+```
+
+The log levels are: trace, debug, info, warning, error, critical, and off.
+
+To set the log level for, say the wasm logger, to info:
+
+```shell
+istioctl proxy-config log -n istio-system deploy/istio-ingressgateway --level wasm:info
+```
+
+This can be useful for debugging wasm plugins (extensions).
+
+The output displays the updated logging levels for every logger for that Envoy instance.
+
+Log levels can be reset for all loggers with the `--reset` flag:
+
+```shell
+istioctl proxy-config log -n istio-system deploy/istio-ingressgateway --reset
+```

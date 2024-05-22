@@ -195,3 +195,71 @@ The command fails with a `Connection reset by peer` error, because there is no f
 ## Sidecar injection problems
 
 The Istio docs have a page titled [sidecar injection problems](https://istio.io/latest/docs/ops/common-problems/injection/) that catalogs sidecar injection errors and their remedies.
+
+## Communication between proxies and `istiod`
+
+It is important to realize that `istiod` has a constant line of communication with all of the Envoy's:  both gateways and sidecars.
+
+When we run `istioctl proxy-status` we get insight into all the proxies that `istiod` controls, and whether the latest configurations have been sent and synced with each proxy.
+
+A common issue is forgetting to upgrade the sidecars after an Istio upgrade.
+
+To illustrated the issue, let us upgrade Istio in place.
+
+### Upgrading Istio and "dangling" sidecars
+
+Download a newer version of Istio, version {{istio.version}}:
+
+```shell
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION={{istio.version}} sh -
+```
+
+Replace the `istioctl` CLI in your PATH with the one from the new distribution.
+
+Verify that the Istio CLI version is now version {{istio.version}}:
+
+```console
+client version: {{istio.version}}
+control plane version: {{istio.upgrade_from}}
+data plane version: {{istio.upgrade_from}} (2 proxies)
+```
+
+Upgrade Istio in-place:
+
+```shell
+istioctl upgrade -f artifacts/install/trace-config.yaml
+```
+
+Re-run `istioctl version` and note the output:
+
+```console
+client version: {{istio.version}}
+control plane version: {{istio.version}}
+data plane version: {{istio.upgrade_from}} (1 proxies), {{istio.version}} (1 proxies)
+```
+
+What is going on here?
+
+1. The Istio CLI was upgraded
+1. The control plane was also upgraded
+1. The ingress gateway component, running envoy, was also upgraded
+1. However, note that there's still one proxy associated with the older version of Istio
+
+Get more information with:
+
+```shell
+istioctl proxy-status
+```
+
+We can see that `httpbin` was left alone.  It still has a sidecar, but it's not associated with the new control plane.
+It's a sort of "orphaned" sidecar in that the new, updated Istio is not communicating with it.
+
+After an upgrade, it's important to be aware that the sidecars (the data plane) are not updated automatically.
+
+To update `httpbin`'s sidecar, restart the deployment:
+
+```shell
+kubectl rollout restart deploy httpbin
+```
+
+Re-run `istioctl proxy-status` and verify that the `httpbin` sidecar is now associated with Istio version {{istio.version}}.

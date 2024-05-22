@@ -49,7 +49,7 @@ istioctl version
     Part of the output from `istioctl version` is:
 
     ```console
-    data plane version: 1.21.2 (1 proxies)
+    data plane version: {{istio.upgrade_from}} (1 proxies)
     ```
 
     Can you explain what this means?  What proxies are being referred to?

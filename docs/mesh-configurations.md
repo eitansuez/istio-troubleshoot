@@ -21,7 +21,7 @@ kubectl label ns default istio-injection=enabled
 Deploy the bookinfo sample application to the `default` namespace:
 
 ```shell
-kubectl apply -f ~//istio-{{istio.upgrade_from}}/samples/bookinfo/platform/kube/bookinfo.yaml
+kubectl apply -f ~//istio-{{istio.version}}/samples/bookinfo/platform/kube/bookinfo.yaml
 ```
 
 The sample application consists of a half dozen deployments:  productpage-v1, ratings-v1, details-v1, and reviews-v[1,2,3].

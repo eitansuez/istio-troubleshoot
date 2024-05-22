@@ -21,6 +21,8 @@ nav:
   - mesh-configurations.md
   - data-plane.md
   - obs-setup.md
+  - dataplane-health.md
+  - controlplane-health.md
 markdown_extensions:
   - admonition
   - pymdownx.details

@@ -47,3 +47,15 @@ istioctl version
     ```
 
     Can you explain what this means?  What proxies are being referred to?
+
+## Access Logging
+
+When using the `default` configuration profile, Envoy sidecars and gateways are not default-configured with access logging to standard output.
+
+We can enable [Envoy Access logging](https://istio.io/latest/docs/tasks/observability/logs/access-log/) using Istio's Telemetry API.
+
+Apply the following resource to your Kubernetes cluster:
+
+```shell
+kubectl apply -f artifacts/install/telemetry.yaml
+```

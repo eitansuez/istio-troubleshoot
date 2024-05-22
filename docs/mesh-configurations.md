@@ -241,7 +241,7 @@ We will revisit the `istioctl proxy-config` command in subsequent scenarios.
 The page titled [Debugging Envoy and Istiod](https://istio.io/latest/docs/ops/diagnostic-tools/proxy-cmd/) does a great job of explaining the `istioctl proxy-config` command in more detail.
 
 
-### Using the correct workload selector
+## Using the correct workload selector
 
 [Workload selectors](https://istio.io/latest/docs/reference/config/type/workload-selector/#WorkloadSelector) feature in the configuration of many Istio resources.  They are used to specify which envoy proxies to target, for different purposes.
 
@@ -336,3 +336,80 @@ The output is quite lengthy.  Here is the relevant portion, showing the [Envoy R
                       principalName:
                         exact: spiffe://cluster.local/ns/default/sa/bookinfo-productpage
 ```
+
+## Ingress Gateways
+
+Let's explore troubleshooting issues with ingress configuration.
+
+Apply the following resource to the cluster:
+
+```shell
+kubectl apply -f artifacts/mesh-config/bookinfo-gateway.yaml
+```
+
+`bookinfo-gateway.yaml` configures both a [Gateway](https://istio.io/latest/docs/reference/config/networking/gateway/) resource and a VirtualService to route incoming traffic to the `productpage` app.
+
+Assuming the local cluster deployed with k3d in [setup](setup.md#kubernetes), the ingress gateway is reachable on localhost port 80:
+
+```shell
+curl http://localhost/productpage
+```
+
+There are many opportunities for misconfiguration:
+
+1. The Gateway selector that selects the ingress gateway.
+
+    If for example we get the selector wrong, running `istioctl analyze` will catch the invalid reference:
+
+    ```console
+    Error [IST0101] (Gateway default/bookinfo-gateway) Referenced selector not found: "istio=ingressgateways"
+    ```
+
+1. The VirtualService that references the gateway.
+
+    Here too `istioctl analyze` will catch the invalid reference:
+
+    ```console
+    Error [IST0101] (VirtualService default/bookinfo) Referenced gateway not found: "bookinfo-gateways"
+    Warning [IST0132] (VirtualService default/bookinfo) one or more host [*] defined in VirtualService default/bookinfo not found in Gateway default/bookinfo-gateways.
+    ```
+
+1. The routing rule with the destination workload name and port.
+
+    Mistype the destination workload and watch `istioctl analyze` catch that too:
+
+    ```console
+    Error [IST0101] (VirtualService default/bookinfo) Referenced host not found: "productpages"
+    ```
+
+### Other categories of issues
+
+What if everything is configured correctly but for some reason the backing workload is not accessible?
+
+Simulate this situation by scaling the `productpage-v1` deployment to zero replicas:
+
+```shell
+kubectl scale deploy productpage-v1 --replicas 0
+```
+
+In one terminal, tail the logs of the ingress gateway:
+
+```shell
+kubectl logs --follow -n istio-system -l istio=ingressgateway
+```
+
+In another terminal, send a request in through the ingress gateway:
+
+```shell
+curl http://localhost/productpage
+```
+
+The response should say "no healthy upstream".  In the logs you'll see this line:
+
+```console
+"GET /productpage HTTP/1.1" 503 UH no_healthy_upstream - "-" 0 19 0 - "10.42.0.1" "curl/8.7.1" "c4c58af1-2066-4c45-affb-d1345d32fc66" "localhost" "-" outbound|9080||productpage.default.svc.cluster.local - 10.42.0.7:8080 10.42.0.1:60667 - -
+```
+
+Note the UH [response flag](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log-format-response-flags):  No Healthy Upstream.
+
+These response flags clearly communicate to the operator the reason for which the request did not succeed.

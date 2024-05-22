@@ -413,3 +413,51 @@ The response should say "no healthy upstream".  In the logs you'll see this line
 Note the UH [response flag](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log-format-response-flags):  No Healthy Upstream.
 
 These response flags clearly communicate to the operator the reason for which the request did not succeed.
+
+As another example, make a request to a route that does not match any routing rules in the virtual service:
+
+```shell
+curl http://localhost/productpages
+```
+
+The log entry responds with a 404 "NR", for "No Route Found":
+
+```console
+"GET /productpages HTTP/1.1" 404 NR route_not_found - "-" 0 0 0 - "10.42.0.1" "curl/8.7.1" "2606aaa9-8c5c-4987-9ba7-86b89f901d34" "localhost" "-" - - 10.42.0.7:8080 10.42.0.1:13819 - -
+```
+
+#### Another example
+
+Delete the bookinfo gateway and virtualservice:
+
+```shell
+kubectl delete -f artifacts/mesh-config/bookinfo-gateway.yaml
+```
+
+And in its place configure ingress for `httpbin`:
+
+```shell
+kubectl apply -f artifacts/mesh-config/httpbin-gateway.yaml
+```
+
+```yaml linenums="1" hl_lines="31-33"
+--8<-- "mesh-config/httpbin-gateway.yaml"
+```
+
+The virtualservice is configured with three retry attempts in the event of a 503 response.
+
+Call the `httpbin` endpoint that returns a 503:
+
+```shell
+curl http://localhost/status/503
+```
+
+The Envoy gateway logs will show the response flag URX:  UpstreamRetryLimitExceeded:
+
+```console
+"GET /status/503 HTTP/1.1" 503 URX via_upstream - "-" 0 0 120 119 "10.42.0.1" "curl/8.7.1" "dcb3b100-e296-4031-8f45-1234d20b0f20" "localhost" "10.42.0.9:8080" outbound|8000||httpbin.default.svc.cluster.local 10.42.0.7:38902 10.42.0.7:8080 10.42.0.1:51761 - -
+```
+
+That is, the gateway got a 503, retried the request up to three times, and then gave up.
+
+Envoy's response flags provide insight into why a request to a target destination workload might have failed.

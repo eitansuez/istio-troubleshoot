@@ -8,6 +8,12 @@ In this exploration, we investigate issues with the data plane:  everything is c
 
 We have ingress configured for the bookinfo application, routing requests to the `productpage` destination.
 
+Assuming the local cluster deployed with k3d in [setup](setup.md#kubernetes), the ingress gateway is reachable on localhost, port 80:
+
+```shell
+export GATEWAY_IP=localhost
+```
+
 ### No Healthy Upstream (UH)
 
 What if for some reason the backing workload is not accessible?
@@ -27,7 +33,7 @@ kubectl logs --follow -n istio-system -l istio=ingressgateway
 In another terminal, send a request in through the ingress gateway:
 
 ```shell
-curl http://localhost/productpage
+curl http://$GATEWAY_IP/productpage
 ```
 
 In the logs you should see the following line:
@@ -45,7 +51,7 @@ These response flags clearly communicate to the operator the reason for which th
 As another example, make a request to a route that does not match any routing rules in the virtual service:
 
 ```shell
-curl http://localhost/productpages
+curl http://$GATEWAY_IP/productpages
 ```
 
 The log entry responds with a 404 "NR", for "No Route Found":
@@ -77,7 +83,7 @@ The VirtualService is configured with three retry attempts in the event of a 503
 Call the `httpbin` endpoint that returns a 503:
 
 ```shell
-curl http://localhost/status/503
+curl http://$GATEWAY_IP/status/503
 ```
 
 The Envoy gateway logs will show the response flag URX:  UpstreamRetryLimitExceeded:
@@ -103,7 +109,7 @@ kubectl logs --follow deploy/httpbin -c istio-proxy
 Repeat the call to the httpbin 503 endpoint:
 
 ```shell
-curl http://localhost/status/503
+curl http://$GATEWAY_IP/status/503
 ```
 
 You will see four inbound requests received by the sidecar, i.e. 3 retry attempts.

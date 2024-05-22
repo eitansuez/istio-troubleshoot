@@ -349,10 +349,16 @@ kubectl apply -f artifacts/mesh-config/bookinfo-gateway.yaml
 
 `bookinfo-gateway.yaml` configures both a [Gateway](https://istio.io/latest/docs/reference/config/networking/gateway/) resource and a VirtualService to route incoming traffic to the `productpage` app.
 
-Assuming the local cluster deployed with k3d in [setup](setup.md#kubernetes), the ingress gateway is reachable on localhost port 80:
+Assuming the local cluster deployed with k3d in [setup](setup.md#kubernetes), the ingress gateway is reachable on localhost, port 80:
 
 ```shell
-curl http://localhost/productpage
+export GATEWAY_IP=localhost
+```
+
+Then:
+
+```shell
+curl http://$GATEWAY_IP/productpage
 ```
 
 There are many opportunities for misconfiguration:

@@ -1,0 +1,780 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../mesh-configurations/">
+      
+      
+        <link rel="next" href="../obs-setup/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.24">
+    
+    
+      
+        <title>The data plane - Debugging and Troubleshooting Istio</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6543a935.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#the-data-plane" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Debugging and Troubleshooting Istio" class="md-header__button md-logo" aria-label="Debugging and Troubleshooting Istio" data-md-component="logo">
+      
+  <img src="../assets/tetrate-logo-white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Debugging and Troubleshooting Istio
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              The data plane
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Debugging and Troubleshooting Istio" class="md-nav__button md-logo" aria-label="Debugging and Troubleshooting Istio" data-md-component="logo">
+      
+  <img src="../assets/tetrate-logo-white.png" alt="logo">
+
+    </a>
+    Debugging and Troubleshooting Istio
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Welcome
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sidecar-injection/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Sidecar Injection
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mesh-configurations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mesh Configurations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    The data plane
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    The data plane
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#no-healthy-upstream-uh" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Healthy Upstream (UH)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no-route-found-nr" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Route Found (NR)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#upstreamretrylimitexceeded-urx" class="md-nav__link">
+    <span class="md-ellipsis">
+      UpstreamRetryLimitExceeded (URX)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sidecar-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sidecar logs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#log-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      Log levels
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../obs-setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Observability setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataplane-health/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data plane Health
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../controlplane-health/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Control plane Health
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#no-healthy-upstream-uh" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Healthy Upstream (UH)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#no-route-found-nr" class="md-nav__link">
+    <span class="md-ellipsis">
+      No Route Found (NR)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#upstreamretrylimitexceeded-urx" class="md-nav__link">
+    <span class="md-ellipsis">
+      UpstreamRetryLimitExceeded (URX)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sidecar-logs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sidecar logs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#log-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      Log levels
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="the-data-plane">The data plane<a class="headerlink" href="#the-data-plane" title="Permanent link">&para;</a></h1>
+<p>In the previous exploration we looked at issues relating to misconfiguration.</p>
+<p>In this exploration, we investigate issues with the data plane:  everything is configured correctly, but some traffic flow isn't functioning, and we need to find out why.</p>
+<p>We have ingress configured for the bookinfo application, routing requests to the <code>productpage</code> destination.</p>
+<p>Assuming the local cluster deployed with k3d in <a href="../setup/#kubernetes">setup</a>, the ingress gateway is reachable on localhost, port 80:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GATEWAY_IP</span><span class="o">=</span>localhost
+</code></pre></div>
+<h2 id="no-healthy-upstream-uh">No Healthy Upstream (UH)<a class="headerlink" href="#no-healthy-upstream-uh" title="Permanent link">&para;</a></h2>
+<p>What if for some reason the backing workload is not accessible?</p>
+<p>Simulate this situation by scaling the <code>productpage-v1</code> deployment to zero replicas:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>scale<span class="w"> </span>deploy<span class="w"> </span>productpage-v1<span class="w"> </span>--replicas<span class="w"> </span><span class="m">0</span>
+</code></pre></div>
+<p>In one terminal, tail the logs of the ingress gateway:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>logs<span class="w"> </span>--follow<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span>-l<span class="w"> </span><span class="nv">istio</span><span class="o">=</span>ingressgateway
+</code></pre></div>
+<p>In another terminal, send a request in through the ingress gateway:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>http://<span class="nv">$GATEWAY_IP</span>/productpage
+</code></pre></div>
+<p>In the logs you should see the following line:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="go">&quot;GET /productpage HTTP/1.1&quot; 503 UH no_healthy_upstream - &quot;-&quot; 0 19 0 - &quot;10.42.0.1&quot; &quot;curl/8.7.1&quot; &quot;c4c58af1-2066-4c45-affb-d1345d32fc66&quot; &quot;localhost&quot; &quot;-&quot; outbound|9080||productpage.default.svc.cluster.local - 10.42.0.7:8080 10.42.0.1:60667 - -</span>
+</code></pre></div>
+<p>Note the UH <a href="https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log-format-response-flags">response flag</a>:  No Healthy Upstream.</p>
+<p>These response flags clearly communicate to the operator the reason for which the request did not succeed.</p>
+<h2 id="no-route-found-nr">No Route Found (NR)<a class="headerlink" href="#no-route-found-nr" title="Permanent link">&para;</a></h2>
+<p>As another example, make a request to a route that does not match any routing rules in the virtual service:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>http://<span class="nv">$GATEWAY_IP</span>/productpages
+</code></pre></div>
+<p>The log entry responds with a 404 "NR", for "No Route Found":</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="go">&quot;GET /productpages HTTP/1.1&quot; 404 NR route_not_found - &quot;-&quot; 0 0 0 - &quot;10.42.0.1&quot; &quot;curl/8.7.1&quot; &quot;2606aaa9-8c5c-4987-9ba7-86b89f901d34&quot; &quot;localhost&quot; &quot;-&quot; - - 10.42.0.7:8080 10.42.0.1:13819 - -</span>
+</code></pre></div>
+<h2 id="upstreamretrylimitexceeded-urx">UpstreamRetryLimitExceeded (URX)<a class="headerlink" href="#upstreamretrylimitexceeded-urx" title="Permanent link">&para;</a></h2>
+<p>Delete the <code>bookinfo</code> Gateway and VirtualService resources:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/bookinfo-gateway.yaml
+</code></pre></div>
+<p>In its place, configure ingress for the <code>httpbin</code> workload:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>artifacts/data-plane/httpbin-gateway.yaml
+</code></pre></div>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-9-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-9-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-9-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-9-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-9-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-9-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-9-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-9-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-9-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-9-10">10</a></span>
+<span class="normal"><a href="#__codelineno-9-11">11</a></span>
+<span class="normal"><a href="#__codelineno-9-12">12</a></span>
+<span class="normal"><a href="#__codelineno-9-13">13</a></span>
+<span class="normal"><a href="#__codelineno-9-14">14</a></span>
+<span class="normal"><a href="#__codelineno-9-15">15</a></span>
+<span class="normal"><a href="#__codelineno-9-16">16</a></span>
+<span class="normal"><a href="#__codelineno-9-17">17</a></span>
+<span class="normal"><a href="#__codelineno-9-18">18</a></span>
+<span class="normal"><a href="#__codelineno-9-19">19</a></span>
+<span class="normal"><a href="#__codelineno-9-20">20</a></span>
+<span class="normal"><a href="#__codelineno-9-21">21</a></span>
+<span class="normal"><a href="#__codelineno-9-22">22</a></span>
+<span class="normal"><a href="#__codelineno-9-23">23</a></span>
+<span class="normal"><a href="#__codelineno-9-24">24</a></span>
+<span class="normal"><a href="#__codelineno-9-25">25</a></span>
+<span class="normal"><a href="#__codelineno-9-26">26</a></span>
+<span class="normal"><a href="#__codelineno-9-27">27</a></span>
+<span class="normal"><a href="#__codelineno-9-28">28</a></span>
+<span class="normal"><a href="#__codelineno-9-29">29</a></span>
+<span class="normal"><a href="#__codelineno-9-30">30</a></span>
+<span class="normal"><a href="#__codelineno-9-31">31</a></span>
+<span class="normal"><a href="#__codelineno-9-32">32</a></span>
+<span class="normal"><a href="#__codelineno-9-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1alpha3</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Gateway</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin-gateway</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6"></a><span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7"></a><span class="w">    </span><span class="nt">istio</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ingressgateway</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8"></a><span class="w">  </span><span class="nt">servers</span><span class="p">:</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">port</span><span class="p">:</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10"></a><span class="w">      </span><span class="nt">number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11"></a><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12"></a><span class="w">      </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HTTP</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13"></a><span class="w">    </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15"></a><span class="nn">---</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1alpha3</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VirtualService</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21"></a><span class="w">  </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23"></a><span class="w">  </span><span class="nt">gateways</span><span class="p">:</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin-gateway</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25"></a><span class="w">  </span><span class="nt">http</span><span class="p">:</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">route</span><span class="p">:</span>
+<a id="__codelineno-9-27" name="__codelineno-9-27"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">destination</span><span class="p">:</span>
+<a id="__codelineno-9-28" name="__codelineno-9-28"></a><span class="w">        </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin</span>
+<a id="__codelineno-9-29" name="__codelineno-9-29"></a><span class="w">        </span><span class="nt">port</span><span class="p">:</span>
+<a id="__codelineno-9-30" name="__codelineno-9-30"></a><span class="w">          </span><span class="nt">number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8000</span>
+<a id="__codelineno-9-31" name="__codelineno-9-31"></a><span class="hll"><span class="w">    </span><span class="nt">retries</span><span class="p">:</span>
+</span><a id="__codelineno-9-32" name="__codelineno-9-32"></a><span class="hll"><span class="w">      </span><span class="nt">attempts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+</span><a id="__codelineno-9-33" name="__codelineno-9-33"></a><span class="hll"><span class="w">      </span><span class="nt">retryOn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gateway-error,connect-failure,refused-stream</span>
+</span></code></pre></div></td></tr></table></div>
+<p>The VirtualService is configured with three retry attempts in the event of a 503 response.</p>
+<p>Call the <code>httpbin</code> endpoint that returns a 503:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>http://<span class="nv">$GATEWAY_IP</span>/status/503
+</code></pre></div>
+<p>The Envoy gateway logs will show the response flag URX:  UpstreamRetryLimitExceeded:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="go">&quot;GET /status/503 HTTP/1.1&quot; 503 URX via_upstream - &quot;-&quot; 0 0 120 119 &quot;10.42.0.1&quot; &quot;curl/8.7.1&quot; &quot;dcb3b100-e296-4031-8f45-1234d20b0f20&quot; &quot;localhost&quot; &quot;10.42.0.9:8080&quot; outbound|8000||httpbin.default.svc.cluster.local 10.42.0.7:38902 10.42.0.7:8080 10.42.0.1:51761 - -</span>
+</code></pre></div>
+<p>That is, the gateway got a 503, retried the request up to three times, and then gave up.</p>
+<p>Envoy's response flags provide insight into why a request to a target destination workload might have failed.</p>
+<h2 id="sidecar-logs">Sidecar logs<a class="headerlink" href="#sidecar-logs" title="Permanent link">&para;</a></h2>
+<p>We are not restricted to inspecting the logs of the ingress gateway.  We can also check the logs of the Envoy sidecars.</p>
+<p>Tail the logs for the sidecar of the httpbin destination workload:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>logs<span class="w"> </span>--follow<span class="w"> </span>deploy/httpbin<span class="w"> </span>-c<span class="w"> </span>istio-proxy
+</code></pre></div>
+<p>Repeat the call to the httpbin 503 endpoint:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl<span class="w"> </span>http://<span class="nv">$GATEWAY_IP</span>/status/503
+</code></pre></div>
+<p>You will see four inbound requests received by the sidecar, i.e. 3 retry attempts.</p>
+<h2 id="log-levels">Log levels<a class="headerlink" href="#log-levels" title="Permanent link">&para;</a></h2>
+<p>The log level for any Envoy proxy can be either displayed or configured with the <a href="https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-proxy-config-log">proxy-config log command</a>.</p>
+<p>Envoy has many loggers.  The log level for each logger can be configured independently.</p>
+<p>For example, let us target the Istio ingress gateway deployment.</p>
+<p>To view the log levels for each logger, run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>log<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span>deploy/istio-ingressgateway
+</code></pre></div>
+<p>The log levels are: trace, debug, info, warning, error, critical, and off.</p>
+<p>To set the log level for, say the wasm logger, to info:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>log<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span>deploy/istio-ingressgateway<span class="w"> </span>--level<span class="w"> </span>wasm:info
+</code></pre></div>
+<p>This can be useful for debugging wasm plugins (extensions).</p>
+<p>The output displays the updated logging levels for every logger for that Envoy instance.</p>
+<p>Log levels can be reset for all loggers with the <code>--reset</code> flag:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>log<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span>deploy/istio-ingressgateway<span class="w"> </span>--reset
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../mesh-configurations/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Mesh Configurations">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Mesh Configurations
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../obs-setup/" class="md-footer__link md-footer__link--next" aria-label="Next: Observability setup">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Observability setup
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.top", "navigation.instant", "navigation.tracking", "navigation.footer", "navigation.expand", "content.code.annotate", "content.code.copy"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.081f42fc.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1030 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../install/">
+      
+      
+        <link rel="next" href="../mesh-configurations/">
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.24">
+    
+    
+      
+        <title>Sidecar Injection - Debugging and Troubleshooting Istio</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.6543a935.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="blue-grey" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sidecar-injection" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Debugging and Troubleshooting Istio" class="md-header__button md-logo" aria-label="Debugging and Troubleshooting Istio" data-md-component="logo">
+      
+  <img src="../assets/tetrate-logo-white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Debugging and Troubleshooting Istio
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Sidecar Injection
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Debugging and Troubleshooting Istio" class="md-nav__button md-logo" aria-label="Debugging and Troubleshooting Istio" data-md-component="logo">
+      
+  <img src="../assets/tetrate-logo-white.png" alt="logo">
+
+    </a>
+    Debugging and Troubleshooting Istio
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Welcome
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../install/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Installation
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Sidecar Injection
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Sidecar Injection
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#main-lesson" class="md-nav__link">
+    <span class="md-ellipsis">
+      Main lesson
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ways-to-specify-sidecar-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ways to specify sidecar injection
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ways to specify sidecar injection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#automatic-at-the-namespace-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automatic at the namespace level
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#automatic-at-the-pod-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automatic at the pod level
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual" class="md-nav__link">
+    <span class="md-ellipsis">
+      Manual
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-many-proxies-does-istio-see" class="md-nav__link">
+    <span class="md-ellipsis">
+      How many proxies does Istio see?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proxy-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      Proxy status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check injection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consequences-of-a-missing-sidecar" class="md-nav__link">
+    <span class="md-ellipsis">
+      Consequences of a missing sidecar
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consequences of a missing sidecar">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-scenario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example scenario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sidecar-injection-problems" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sidecar injection problems
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#communication-between-proxies-and-istiod" class="md-nav__link">
+    <span class="md-ellipsis">
+      Communication between proxies and istiod
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Communication between proxies and istiod">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upgrading-istio-and-dangling-sidecars" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrading Istio and "dangling" sidecars
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mesh-configurations/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Mesh Configurations
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data-plane/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    The data plane
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../obs-setup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Observability setup
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataplane-health/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Data plane Health
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../controlplane-health/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Control plane Health
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#main-lesson" class="md-nav__link">
+    <span class="md-ellipsis">
+      Main lesson
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ways-to-specify-sidecar-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ways to specify sidecar injection
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Ways to specify sidecar injection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#automatic-at-the-namespace-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automatic at the namespace level
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#automatic-at-the-pod-level" class="md-nav__link">
+    <span class="md-ellipsis">
+      Automatic at the pod level
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#manual" class="md-nav__link">
+    <span class="md-ellipsis">
+      Manual
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-many-proxies-does-istio-see" class="md-nav__link">
+    <span class="md-ellipsis">
+      How many proxies does Istio see?
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#proxy-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      Proxy status
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#check-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      Check injection
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#consequences-of-a-missing-sidecar" class="md-nav__link">
+    <span class="md-ellipsis">
+      Consequences of a missing sidecar
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Consequences of a missing sidecar">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-scenario" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example scenario
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sidecar-injection-problems" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sidecar injection problems
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#communication-between-proxies-and-istiod" class="md-nav__link">
+    <span class="md-ellipsis">
+      Communication between proxies and istiod
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Communication between proxies and istiod">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upgrading-istio-and-dangling-sidecars" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrading Istio and "dangling" sidecars
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+<h1 id="sidecar-injection">Sidecar Injection<a class="headerlink" href="#sidecar-injection" title="Permanent link">&para;</a></h1>
+<p>The Istio documentation contains <a href="https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/">a guide on sidecar injection</a> that explains both:</p>
+<ul>
+<li>the mechanism for configuring sidecar injection, and</li>
+<li>the ways in which sidecar injection can be controlled.</li>
+</ul>
+<h2 id="main-lesson">Main lesson<a class="headerlink" href="#main-lesson" title="Permanent link">&para;</a></h2>
+<p>The most important thing to understand about sidecar injection is that <strong>it occurs at pod creation time</strong>.</p>
+<p>This means that <em>if you configure a pod or a namespace for sidecar injection, it won't affect any pods that are already running</em>.</p>
+<h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
+<p>Deploy the <code>httpbin</code> workload to the default namespace:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>~/istio-1.21.2/samples/httpbin/httpbin.yaml
+</code></pre></div>
+<p>The simplest way to tell whether sidecar injection took place is to display the number containers running in the pod:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pod
+</code></pre></div>
+<p>Note the READY column shows 1/1 (one out of one) containers.</p>
+<p>Label the <code>default</code> namespace for sidecar injection:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>label<span class="w"> </span>ns<span class="w"> </span>default<span class="w"> </span>istio-injection<span class="o">=</span>enabled
+</code></pre></div>
+<p>The above act is passive:  <strong>nothing will happen until a pod is created in the <code>default</code> namespace</strong>.</p>
+<p>Either:</p>
+<ul>
+<li>
+<p>delete the pod and let the deployment create a new one in its place:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>pod<span class="w"> </span>-l<span class="w"> </span><span class="nv">app</span><span class="o">=</span>httpbin
+</code></pre></div>
+</li>
+<li>
+<p>submit a command to the kube api server to restart the deployment</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deploy<span class="w"> </span>httpbin
+</code></pre></div>
+</li>
+</ul>
+<p>List the pods in the <code>default</code> namespace once more:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pod
+</code></pre></div>
+<p>The READY column now shows 2/2 containers.  We have a proxy.</p>
+<h2 id="ways-to-specify-sidecar-injection">Ways to specify sidecar injection<a class="headerlink" href="#ways-to-specify-sidecar-injection" title="Permanent link">&para;</a></h2>
+<h3 id="automatic-at-the-namespace-level">Automatic at the namespace level<a class="headerlink" href="#automatic-at-the-namespace-level" title="Permanent link">&para;</a></h3>
+<p>Above, we used <em>automatic sidecar injection</em>.  This means that deployment manifests do not need to be modified.  Instead, a mutating admission webhook is given the chance to mutate the deployment specification before it is applied to the Kubernetes cluster.</p>
+<p>Verify that the mutating webhook <code>istio-sidecar-injection</code> exists on the cluster:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>mutatingwebhookconfigurations
+</code></pre></div>
+<p>The template used by the sidecar injector is encoded in the ConfigMap named <code>istio-sidecar-injector</code> in the <code>istio-system</code> namespace:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>cm<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span>istio-sidecar-injector<span class="w"> </span>-o<span class="w"> </span>yaml
+</code></pre></div>
+<p>Automatic sidecar injection at the namespace level is convenient, and the recommended method.</p>
+<h3 id="automatic-at-the-pod-level">Automatic at the pod level<a class="headerlink" href="#automatic-at-the-pod-level" title="Permanent link">&para;</a></h3>
+<p>Istio provides a mechanism to <a href="https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/#controlling-the-injection-policy">control sidecar injection</a> at the pod level, by labeling the pod with <code>sidecar.istio.io/inject</code> with the value "true".</p>
+<p>Instead of labeling the namespace, we could have just applied the label to the <code>httpbin</code> workload.</p>
+<h3 id="manual">Manual<a class="headerlink" href="#manual" title="Permanent link">&para;</a></h3>
+<p>The Istio CLI provides the <a href="https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-kube-inject"><code>kube-inject</code> command</a> to render the template against a deployment manifest.</p>
+<p>For example:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>istioctl<span class="w"> </span>kube-inject<span class="w"> </span>-f<span class="w"> </span>~/istio-1.21.2/samples/httpbin/httpbin.yaml<span class="w"> </span>&gt;<span class="w"> </span>injected.yaml
+</code></pre></div>
+<p>Inspect the generated file <code>injected.yaml</code> and confirm that the deployment resource now specifies two containers.</p>
+<div class="admonition question">
+<p class="admonition-title">Question</p>
+<p>What name does Istio use for the sidecar container?</p>
+</div>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p>The typical questions one should ask when troubleshooting sidecar injection include:</p>
+<ul>
+<li>
+<p>Was the namespace labeled for sidecar injection?</p>
+<p>This can be verified with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>ns<span class="w"> </span>-Listio-injection
+</code></pre></div>
+</li>
+<li>
+<p>Was the deployment restarted after labeling the namespace?</p>
+<p>This is one of the more common reasons that the sidecar is not injected.</p>
+</li>
+</ul>
+<h3 id="how-many-proxies-does-istio-see"><img alt="❓" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@14.1.2/assets/svg/2753.svg" title=":question:" /> How many proxies does Istio see?<a class="headerlink" href="#how-many-proxies-does-istio-see" title="Permanent link">&para;</a></h3>
+<p>Remember the <code>istioctl version</code> command?  Run it again.
+How many proxies are listed in the data plane?
+The original count was one.
+If the count still shows "1", it means that no additional proxies were deployed.</p>
+<h3 id="proxy-status">Proxy status<a class="headerlink" href="#proxy-status" title="Permanent link">&para;</a></h3>
+<p>Yet another diagnostic command is the <a href="https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-proxy-status">proxy-status</a> command</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>istioctl<span class="w"> </span>proxy-status
+</code></pre></div>
+<p>If <code>httpbin</code> is not listed in the output, it's an indication that Istio does not know about it, possibly because no sidecar was injected.</p>
+<p>We will revisit the <code>proxy-status</code> command later.</p>
+<h3 id="check-injection">Check injection<a class="headerlink" href="#check-injection" title="Permanent link">&para;</a></h3>
+<p>The Istio CLI provides the <a href="https://istio.io/latest/docs/ops/diagnostic-tools/check-inject/">check-inject command</a> to check whether sidecar injection has taken place for a given workload:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>istioctl<span class="w"> </span>x<span class="w"> </span>check-inject<span class="w"> </span>-l<span class="w"> </span><span class="nv">app</span><span class="o">=</span>httpbin
+</code></pre></div>
+<p>Look for a green checkmark under the INJECTED column.</p>
+<h2 id="consequences-of-a-missing-sidecar">Consequences of a missing sidecar<a class="headerlink" href="#consequences-of-a-missing-sidecar" title="Permanent link">&para;</a></h2>
+<p>Fundamentally, a missing sidecar means that all traffic in and out of the pod will not be governed by Istio.</p>
+<p>This implies that:</p>
+<ul>
+<li>Any Istio custom resources that target that workload will have no effect.  There is no proxy to program.</li>
+<li>The workload will not be considered a part of the mesh.  No service discovery information will be communicated to peer workloads.</li>
+</ul>
+<p>In specific circumstances, it could mean that communication between the workload and other mesh workloads will not function.</p>
+<h3 id="example-scenario">Example scenario<a class="headerlink" href="#example-scenario" title="Permanent link">&para;</a></h3>
+<p>Remove the sidecar injection label from the namespace:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>label<span class="w"> </span>ns<span class="w"> </span>default<span class="w"> </span>istio-injection-
+</code></pre></div>
+<p>Deploy the <code>sleep</code> sample, a convenience client from which to <code>curl</code> other workloads:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>~/istio-1.21.2/samples/sleep/sleep.yaml
+</code></pre></div>
+<p>Note that the <code>sleep</code> worklaod has no sidecar.</p>
+<p>Yet, we can still call <code>httpbin</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>deploy/sleep<span class="w"> </span>--<span class="w"> </span>curl<span class="w"> </span>httpbin:8000/get
+</code></pre></div>
+<p>However, if our mesh was configured with strict mutual TLS <a href="https://istio.io/latest/docs/reference/config/security/peer_authentication/">Peer Authentication</a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>artifacts/injection/mtls-strict.yaml
+</code></pre></div>
+<p>An attempt to call <code>httpbin</code> once more will fail:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>deploy/sleep<span class="w"> </span>--<span class="w"> </span>curl<span class="w"> </span>httpbin:8000/get
+</code></pre></div>
+<p>The command fails with a <code>Connection reset by peer</code> error, because there is no forward proxy on <code>sleep</code> to upgrade the connection to mutual TLS, which is now a requirement.</p>
+<h2 id="sidecar-injection-problems">Sidecar injection problems<a class="headerlink" href="#sidecar-injection-problems" title="Permanent link">&para;</a></h2>
+<p>The Istio docs have a page titled <a href="https://istio.io/latest/docs/ops/common-problems/injection/">sidecar injection problems</a> that catalogs sidecar injection errors and their remedies.</p>
+<h2 id="communication-between-proxies-and-istiod">Communication between proxies and <code>istiod</code><a class="headerlink" href="#communication-between-proxies-and-istiod" title="Permanent link">&para;</a></h2>
+<p>It is important to realize that <code>istiod</code> has a constant line of communication with all of the Envoy's:  both gateways and sidecars.</p>
+<p>When we run <code>istioctl proxy-status</code> we get insight into all the proxies that <code>istiod</code> controls, and whether the latest configurations have been sent and synced with each proxy.</p>
+<p>A common issue is forgetting to upgrade the sidecars after an Istio upgrade.</p>
+<p>To illustrated the issue, let us upgrade Istio in place.</p>
+<h3 id="upgrading-istio-and-dangling-sidecars">Upgrading Istio and "dangling" sidecars<a class="headerlink" href="#upgrading-istio-and-dangling-sidecars" title="Permanent link">&para;</a></h3>
+<p>Download a newer version of Istio, version 1.22.0:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://istio.io/downloadIstio<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="nv">ISTIO_VERSION</span><span class="o">=</span><span class="m">1</span>.22.0<span class="w"> </span>sh<span class="w"> </span>-
+</code></pre></div>
+<p>Replace the <code>istioctl</code> CLI in your PATH with the one from the new distribution.</p>
+<p>Verify that the Istio CLI version is now version 1.22.0:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="go">client version: 1.22.0</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="go">control plane version: 1.21.2</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="go">data plane version: 1.21.2 (2 proxies)</span>
+</code></pre></div>
+<p>Upgrade Istio in-place:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>istioctl<span class="w"> </span>upgrade<span class="w"> </span>-f<span class="w"> </span>artifacts/install/trace-config.yaml
+</code></pre></div>
+<p>Re-run <code>istioctl version</code> and note the output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="go">client version: 1.22.0</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="go">control plane version: 1.22.0</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="go">data plane version: 1.21.2 (1 proxies), 1.22.0 (1 proxies)</span>
+</code></pre></div>
+<p>What is going on here?</p>
+<ol>
+<li>The Istio CLI was upgraded</li>
+<li>The control plane was also upgraded</li>
+<li>The ingress gateway component, running envoy, was also upgraded</li>
+<li>However, note that there's still one proxy associated with the older version of Istio</li>
+</ol>
+<p>Get more information with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>istioctl<span class="w"> </span>proxy-status
+</code></pre></div>
+<p>We can see that <code>httpbin</code> was left alone.  It still has a sidecar, but it's not associated with the new control plane.
+It's a sort of "orphaned" sidecar in that the new, updated Istio is not communicating with it.</p>
+<p>After an upgrade, it's important to be aware that the sidecars (the data plane) are not updated automatically.</p>
+<p>To update <code>httpbin</code>'s sidecar, restart the deployment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deploy<span class="w"> </span>httpbin
+</code></pre></div>
+<p>Re-run <code>istioctl proxy-status</code> and verify that the <code>httpbin</code> sidecar is now associated with Istio version 1.22.0.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12Z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../install/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Installation">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Installation
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../mesh-configurations/" class="md-footer__link md-footer__link--next" aria-label="Next: Mesh Configurations">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Mesh Configurations
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4Z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "..", "features": ["navigation.top", "navigation.instant", "navigation.tracking", "navigation.footer", "navigation.expand", "content.code.annotate", "content.code.copy"], "search": "../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.081f42fc.min.js"></script>
+      
+    
+  </body>
+</html>

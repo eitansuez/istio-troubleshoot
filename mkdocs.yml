@@ -19,6 +19,7 @@ nav:
   - install.md
   - sidecar-injection.md
   - mesh-configurations.md
+  - data-plane.md
 markdown_extensions:
   - admonition
   - pymdownx.details

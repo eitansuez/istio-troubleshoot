@@ -621,16 +621,16 @@ We will focus on the call graph visualizations that Kiali generates.</p>
 Each tool will be deployed to the <code>istio-system</code> namespace.
 In production, more work is required to properly deploy, and configure access to each tool.</p>
 <h3 id="deploy-prometheus">Deploy Prometheus<a class="headerlink" href="#deploy-prometheus" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>~/istio-1.22.0/samples/addons/prometheus.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>istio-1.22.0/samples/addons/prometheus.yaml
 </code></pre></div>
 <h3 id="deploy-grafana">Deploy Grafana<a class="headerlink" href="#deploy-grafana" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>~/istio-1.22.0/samples/addons/grafana.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>istio-1.22.0/samples/addons/grafana.yaml
 </code></pre></div>
 <h3 id="deploy-zipkin">Deploy Zipkin<a class="headerlink" href="#deploy-zipkin" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>~/istio-1.22.0/samples/addons/extras/zipkin.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>istio-1.22.0/samples/addons/extras/zipkin.yaml
 </code></pre></div>
 <h3 id="deploy-kiali">Deploy Kiali<a class="headerlink" href="#deploy-kiali" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>~/istio-1.22.0/samples/addons/kiali.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>istio-1.22.0/samples/addons/kiali.yaml
 </code></pre></div>
 <p>Wait on each deployment to be ready.  Check on the workloads with:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pod<span class="w"> </span>-n<span class="w"> </span>istio-system

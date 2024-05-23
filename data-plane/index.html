@@ -648,7 +648,7 @@
 </span></code></pre></div></td></tr></table></div>
 <p>The VirtualService is configured with three retry attempts in the event of a 503 response.</p>
 <p>Call the <code>httpbin</code> endpoint that returns a 503:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>http://<span class="nv">$GATEWAY_IP</span>/status/503
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-v<span class="w"> </span>http://<span class="nv">$GATEWAY_IP</span>/status/503
 </code></pre></div>
 <p>The Envoy gateway logs will show the response flag URX:  UpstreamRetryLimitExceeded:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="go">&quot;GET /status/503 HTTP/1.1&quot; 503 URX via_upstream - &quot;-&quot; 0 0 120 119 &quot;10.42.0.1&quot; &quot;curl/8.7.1&quot; &quot;dcb3b100-e296-4031-8f45-1234d20b0f20&quot; &quot;localhost&quot; &quot;10.42.0.9:8080&quot; outbound|8000||httpbin.default.svc.cluster.local 10.42.0.7:38902 10.42.0.7:8080 10.42.0.1:51761 - -</span>
@@ -661,7 +661,7 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>logs<span class="w"> </span>--follow<span class="w"> </span>deploy/httpbin<span class="w"> </span>-c<span class="w"> </span>istio-proxy
 </code></pre></div>
 <p>Repeat the call to the <code>httpbin</code> "503" endpoint:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl<span class="w"> </span>http://<span class="nv">$GATEWAY_IP</span>/status/503
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl<span class="w"> </span>-v<span class="w"> </span>http://<span class="nv">$GATEWAY_IP</span>/status/503
 </code></pre></div>
 <p>You will see evidence of four inbound requests received by the sidecar, i.e. three retry attempts.</p>
 <h2 id="log-levels">Log levels<a class="headerlink" href="#log-levels" title="Permanent link">&para;</a></h2>

@@ -113,10 +113,7 @@ When monitoring the data plane, look for:
 - High request latency
 - Latency 99 percentile
 
-## The Prometheus dashboard and PromQL queries
-
-[tbd]
-
 ## TODO
 
-Consider adding fault injection to show what error scenarios look like.
+- Adding fault injection and show what error scenarios look like.
+- The Prometheus dashboard and PromQL queries

@@ -18,3 +18,6 @@
     - Frequency of deployment changes (adding, removing, updating)
     - Frequency of mesh configuration changes
     - Service discoverability scope (use sidecar resources)
+
+- Review control plane metrics - istiod footprint, and envoys
+  Then apply sidecar resources to the ensemble and measure the improvement.

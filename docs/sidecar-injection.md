@@ -93,10 +93,12 @@ The Istio CLI provides the [`kube-inject` command](https://istio.io/latest/docs/
 For example:
 
 ```shell
-istioctl kube-inject -f ~/istio-{{istio.upgrade_from}}/samples/httpbin/httpbin.yaml > injected.yaml
+istioctl kube-inject -f istio-{{istio.upgrade_from}}/samples/httpbin/httpbin.yaml > injected.yaml
 ```
 
 Inspect the generated file `injected.yaml` and confirm that the deployment resource now specifies two containers.
+
+Contrast the original Deployment resource with the transformed, injected one.
 
 !!! question
 
@@ -169,7 +171,7 @@ kubectl label ns default istio-injection-
 Deploy the `sleep` sample, a convenience client from which to `curl` other workloads:
 
 ```shell
-kubectl apply -f ~/istio-{{istio.upgrade_from}}/samples/sleep/sleep.yaml
+kubectl apply -f istio-{{istio.upgrade_from}}/samples/sleep/sleep.yaml
 ```
 
 Note that the `sleep` worklaod has no sidecar.
@@ -193,6 +195,38 @@ kubectl exec deploy/sleep -- curl httpbin:8000/get
 ```
 
 The command fails with a `Connection reset by peer` error, because there is no forward proxy on `sleep` to upgrade the connection to mutual TLS, which is now a requirement.
+
+#### Remedy the situation
+
+Run:
+
+```shell
+istioctl proxy-status
+```
+
+Note that `sleep` is not on the list.
+
+Label the namespace once more, and restart the `sleep` deployment:
+
+```shell
+kubectl label ns default istio-injection=enabled && kubectl rollout restart deploy sleep
+```
+
+Re-run:
+
+```shell
+istioctl proxy-status
+```
+
+And confirm that `sleep` is now listed as a proxy.
+
+Finally, call `httpbin` once more:
+
+```shell
+kubectl exec deploy/sleep -- curl httpbin:8000/get
+```
+
+This time it succeeds.
 
 ## Sidecar injection problems
 
@@ -223,7 +257,7 @@ Verify that the Istio CLI version is now version {{istio.version}}:
 ```console
 client version: {{istio.version}}
 control plane version: {{istio.upgrade_from}}
-data plane version: {{istio.upgrade_from}} (2 proxies)
+data plane version: {{istio.upgrade_from}} (3 proxies)
 ```
 
 Upgrade Istio in-place:
@@ -237,7 +271,7 @@ Re-run `istioctl version` and note the output:
 ```console
 client version: {{istio.version}}
 control plane version: {{istio.version}}
-data plane version: {{istio.upgrade_from}} (1 proxies), {{istio.version}} (1 proxies)
+data plane version: {{istio.upgrade_from}} (2 proxies), {{istio.version}} (1 proxies)
 ```
 
 What is going on here?
@@ -245,7 +279,7 @@ What is going on here?
 1. The Istio CLI was upgraded
 1. The control plane was also upgraded
 1. The ingress gateway component, running Envoy, was also upgraded
-1. However, note that there's still one proxy associated with the older version of Istio
+1. However, note that two proxies are still associated with the older version of Istio
 
 Get more information with:
 
@@ -253,15 +287,18 @@ Get more information with:
 istioctl proxy-status
 ```
 
-We can see that `httpbin` was left alone.  It still has a sidecar, but it's not associated with the new control plane.
+We can see that `httpbin` and `sleep` were left alone.
+They still have a sidecar, but they are not associated with the new control plane.
 It's a sort of "orphaned" sidecar in that the new, updated Istio is not communicating with it.
 
 After an upgrade, it's important to be aware that the sidecars (the data plane) are not updated automatically.
 
-To update `httpbin`'s sidecar, restart the deployment:
+To update `httpbin`'s and `sleep`'s sidecars, restart the deployments:
 
 ```shell
-kubectl rollout restart deploy httpbin
+for name in `kubectl get deploy -oname`; do
+  kubectl rollout restart $name;
+done
 ```
 
-Re-run `istioctl proxy-status` and verify that the `httpbin` sidecar is now associated with Istio version {{istio.version}}.
+Re-run `istioctl proxy-status` and verify that the `httpbin` and `sleep` sidecars are now associated with Istio version {{istio.version}}.

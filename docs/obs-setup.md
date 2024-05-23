@@ -100,6 +100,6 @@ istioctl dashboard grafana
 
 This should automatically cause a browser to open to the URL of the Grafana dashboard.
 
-You will find an Istio folder under "Dashboards" in the side navigation bar, containing a variety of pre-built monitoring dashboards.
+Locate, and navigate to the Istio folder under "Dashboards" in the side navigation bar, containing a variety of pre-built monitoring dashboards.
 
 Go ahead and close the browser window and terminate the `istioctl dashboard` command (press ++ctrl+c++), and proceed to the next activity.

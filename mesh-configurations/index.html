@@ -435,6 +435,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Inspect the Envoy configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#another-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Another example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -687,6 +702,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Inspect the Envoy configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#another-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Another example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -728,7 +758,7 @@
 
 
 <h1 id="mesh-configurations">Mesh Configurations<a class="headerlink" href="#mesh-configurations" title="Permanent link">&para;</a></h1>
-<p>This section explores the subject of troubleshooting mesh configurations, and what tools are at your disposal to validate and diagnose configuration-related issues.</p>
+<p>This section explores troubleshooting mesh configurations, and what tools are at your disposal to validate and diagnose configuration-related issues.</p>
 <h2 id="deploy-the-bookinfo-sample-application">Deploy the <code>bookinfo</code> sample application<a class="headerlink" href="#deploy-the-bookinfo-sample-application" title="Permanent link">&para;</a></h2>
 <p>Take a moment to familiarize yourself with the Istio sample application <a href="https://istio.io/latest/docs/examples/bookinfo/"><code>bookinfo</code></a>.</p>
 <p>Verify that the <code>default</code> namespace is labeled for sidecar injection:</p>
@@ -738,24 +768,90 @@
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>label<span class="w"> </span>ns<span class="w"> </span>default<span class="w"> </span>istio-injection<span class="o">=</span>enabled
 </code></pre></div>
 <p>Deploy the bookinfo sample application to the <code>default</code> namespace:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>~//istio-1.22.0/samples/bookinfo/platform/kube/bookinfo.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>istio-1.22.0/samples/bookinfo/platform/kube/bookinfo.yaml
 </code></pre></div>
-<p>The sample application consists of a half dozen deployments:  productpage-v1, ratings-v1, details-v1, and reviews-v[1,2,3].</p>
+<p>The sample application consists of a half dozen deployments:  <code>productpage-v1</code>, <code>ratings-v1</code>, <code>details-v1</code>, and <code>reviews-v[1,2,3]</code>.</p>
 <p>Verify that all workloads are running, and have sidecars:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pod
 </code></pre></div>
 <h2 id="configure-traffic-management">Configure traffic management<a class="headerlink" href="#configure-traffic-management" title="Permanent link">&para;</a></h2>
 <p>Focus on two Istio custom resources, located in the <code>artifacts/mesh-config</code> folder:</p>
 <ul>
-<li><code>dr-reviews.yaml</code>:  A <a href="https://istio.io/latest/docs/reference/config/networking/destination-rule/">DestinationRule</a> that defines the subsets v1, v2, and v3 of the <code>reviews</code> service.</li>
-<li><code>vs-reviews-v1.yaml</code>: A <a href="https://istio.io/latest/docs/reference/config/networking/virtual-service/">VirtualService</a> that directs all traffic to the reviews service to the <code>v1</code> subset.</li>
+<li>
+<p><code>dr-reviews.yaml</code>:  A <a href="https://istio.io/latest/docs/reference/config/networking/destination-rule/">DestinationRule</a> that defines the subsets v1, v2, and v3 of the <code>reviews</code> service.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-4-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-4-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-4-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-4-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-4-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-4-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-4-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-4-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-4-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-4-10">10</a></span>
+<span class="normal"><a href="#__codelineno-4-11">11</a></span>
+<span class="normal"><a href="#__codelineno-4-12">12</a></span>
+<span class="normal"><a href="#__codelineno-4-13">13</a></span>
+<span class="normal"><a href="#__codelineno-4-14">14</a></span>
+<span class="normal"><a href="#__codelineno-4-15">15</a></span>
+<span class="normal"><a href="#__codelineno-4-16">16</a></span>
+<span class="normal"><a href="#__codelineno-4-17">17</a></span>
+<span class="normal"><a href="#__codelineno-4-18">18</a></span>
+<span class="normal"><a href="#__codelineno-4-19">19</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1alpha3</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">DestinationRule</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6"></a><span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews.default.svc.cluster.local</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7"></a><span class="w">  </span><span class="nt">trafficPolicy</span><span class="p">:</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8"></a><span class="w">    </span><span class="nt">loadBalancer</span><span class="p">:</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9"></a><span class="w">      </span><span class="nt">simple</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">RANDOM</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10"></a><span class="w">  </span><span class="nt">subsets</span><span class="p">:</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<a id="__codelineno-4-12" name="__codelineno-4-12"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-4-13" name="__codelineno-4-13"></a><span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<a id="__codelineno-4-14" name="__codelineno-4-14"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span>
+<a id="__codelineno-4-15" name="__codelineno-4-15"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-4-16" name="__codelineno-4-16"></a><span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span>
+<a id="__codelineno-4-17" name="__codelineno-4-17"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v3</span>
+<a id="__codelineno-4-18" name="__codelineno-4-18"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-4-19" name="__codelineno-4-19"></a><span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v3</span>
+</code></pre></div></td></tr></table></div>
+</li>
+<li>
+<p><code>vs-reviews-v1.yaml</code>: A <a href="https://istio.io/latest/docs/reference/config/networking/virtual-service/">VirtualService</a> that directs all traffic to the reviews service to the <code>v1</code> subset.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-5-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-5-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-5-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-5-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-5-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-5-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-5-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-5-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-5-10">10</a></span>
+<span class="normal"><a href="#__codelineno-5-11">11</a></span>
+<span class="normal"><a href="#__codelineno-5-12">12</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1alpha3</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VirtualService</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6"></a><span class="w">  </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8"></a><span class="w">  </span><span class="nt">http</span><span class="p">:</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">route</span><span class="p">:</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">destination</span><span class="p">:</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11"></a><span class="w">        </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="w">        </span><span class="nt">subset</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+</code></pre></div></td></tr></table></div>
+</li>
 </ul>
 <h3 id="validate-resources">Validate resources<a class="headerlink" href="#validate-resources" title="Permanent link">&para;</a></h3>
-<p>Istio provides a <a href="https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-validate">command that perform basic validation</a> on Istio custom resources.</p>
+<p>Istio provides a <a href="https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-validate">command to perform basic validation</a> on Istio custom resources.</p>
 <p>Run the <code>istioctl validate</code> against each of these files:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>istioctl<span class="w"> </span>validate<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/dr-reviews.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>istioctl<span class="w"> </span>validate<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/dr-reviews.yaml
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>istioctl<span class="w"> </span>validate<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/vs-reviews-v1.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>istioctl<span class="w"> </span>validate<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/vs-reviews-v1.yaml
 </code></pre></div>
 <p>We learn that the resource syntax is valid.
 That does not necessarily imply correctness.</p>
@@ -768,139 +864,141 @@ That does not necessarily imply correctness.</p>
 <p><code>validate</code> will also catch a wrong enum name.  For example, try to validate a version of <code>dr-reviews</code> where the loadBalancer value of RANDOM is instead spelled using lowercase.</p>
 </li>
 </ul>
-<p>Apply the destination rule and virtual service to the cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/dr-reviews.yaml
+<p>Apply the DestinationRule and VirtualService to the cluster:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/dr-reviews.yaml
 </code></pre></div>
 <p>And:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/vs-reviews-v1.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/vs-reviews-v1.yaml
 </code></pre></div>
 <h3 id="ascertain-the-applied-configurations">Ascertain the applied configurations<a class="headerlink" href="#ascertain-the-applied-configurations" title="Permanent link">&para;</a></h3>
 <h4 id="was-the-resource-created">Was the resource created?<a class="headerlink" href="#was-the-resource-created" title="Permanent link">&para;</a></h4>
 <p>Did I get an error message when the resources were applied?</p>
 <p>The console output should confirm the resource was created:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="go">destinationrule.networking.istio.io/reviews created</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="go">destinationrule.networking.istio.io/reviews created</span>
 </code></pre></div>
 <h4 id="is-the-resource-present">Is the resource present?<a class="headerlink" href="#is-the-resource-present" title="Permanent link">&para;</a></h4>
 <p>Can I display the resource?</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>destinationrule
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>destinationrule
 </code></pre></div>
 <h4 id="did-i-reference-the-right-namespace">Did I reference the right namespace?<a class="headerlink" href="#did-i-reference-the-right-namespace" title="Permanent link">&para;</a></h4>
-<p>This is a common "gotcha", though in this example we are targeting the default namespace, and it's unlikely we got this wrong.</p>
+<p>This is a common "gotcha", though in this example we are targeting the <code>default</code> namespace, and it's unlikely we got this wrong.</p>
 <h4 id="are-references-correct">Are references correct?<a class="headerlink" href="#are-references-correct" title="Permanent link">&para;</a></h4>
-<p>The destination rule references a host.  Is the hostname spelled correctly?  If the host resides in a different namespace, the hostname should be fully qualified.</p>
-<p>The destination rule also references labels.  Are those labels correct?  They could be misspelled.</p>
+<p>The DestinationRule references a host.  Is the hostname spelled correctly?  If the host resides in a different namespace, the hostname should be fully qualified.</p>
+<p>The DestinationRule also references labels.  Are those labels correct?  They could be misspelled.</p>
 <p>We are also establishing a naming convention whereby each subset has the name v1, v2, and v3.</p>
 <p>The Virtual Service resource references a host, a destination host, and a subset.  Make sure they match the desired host name, target host name, and subset name.</p>
 <h3 id="istioctl-analyze"><code>istioctl analyze</code><a class="headerlink" href="#istioctl-analyze" title="Permanent link">&para;</a></h3>
 <p>The <a href="https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-analyze">analyze command</a> is more powerful than validate, and runs a catalog of analyses against resources applied to the cluster.</p>
 <p>Run the command against the default namespace:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>istioctl<span class="w"> </span>analyze
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>istioctl<span class="w"> </span>analyze
 </code></pre></div>
 <p>There should be no issues.</p>
 <p>Edit the virtualservice and misspell the host field from <code>reviews</code> to, say, <code>reviewss</code>.</p>
 <p>Apply the updated virtualservice to the cluster.</p>
 <p>Re-run analyze.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="go">Error [IST0101] (VirtualService default/reviews) Referenced host not found: &quot;reviewss&quot;</span>
-<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="go">Error [IST0101] (VirtualService default/reviews) Referenced host+subset in destinationrule not found: &quot;reviewss+v1&quot;</span>
-<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="go">Error: Analyzers found issues when analyzing namespace: default.</span>
-<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="go">See https://istio.io/v1.22/docs/reference/config/analysis for more information about causes and resolutions.</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="go">Error [IST0101] (VirtualService default/reviews) Referenced host not found: &quot;reviewss&quot;</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="go">Error [IST0101] (VirtualService default/reviews) Referenced host+subset in destinationrule not found: &quot;reviewss+v1&quot;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="go">Error: Analyzers found issues when analyzing namespace: default.</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="go">See https://istio.io/v1.22/docs/reference/config/analysis for more information about causes and resolutions.</span>
 </code></pre></div>
 <p>To get an idea of the variety of checks that the analyze command performs, follow the <a href="https://istio.io/latest/docs/reference/config/analysis/">above suggested link</a>.</p>
 <p>In this instance we're warned of the invalid references.</p>
-<p>We will revisit the analyze command in subsequent example scenarios.</p>
+<p>We will revisit the <code>analyze</code> command in subsequent example scenarios.</p>
 <h3 id="istioctl-x-describe"><code>istioctl x describe</code><a class="headerlink" href="#istioctl-x-describe" title="Permanent link">&para;</a></h3>
-<p>The describe command is yet another useful way to independently verifying the configuration against the <code>reviews</code> service.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>istioctl<span class="w"> </span>x<span class="w"> </span>describe<span class="w"> </span>svc<span class="w"> </span>reviews
+<p>The describe command is yet another useful way to independently verify the configuration against the <code>reviews</code> service.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>istioctl<span class="w"> </span>x<span class="w"> </span>describe<span class="w"> </span>svc<span class="w"> </span>reviews
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="go">Service: reviews</span>
-<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="go">   Port: http 9080/HTTP targets pod port 9080</span>
-<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="go">DestinationRule: reviews for &quot;reviews.default.svc.cluster.local&quot;</span>
-<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="go">   Matching subsets: v1,v2,v3</span>
-<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="go">   Policies: load balancer</span>
-<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="go">VirtualService: reviews</span>
-<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="go">   1 HTTP route(s)</span>
+<p>Here is the output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="go">Service: reviews</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="go">   Port: http 9080/HTTP targets pod port 9080</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="go">DestinationRule: reviews for &quot;reviews.default.svc.cluster.local&quot;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="go">   Matching subsets: v1,v2,v3</span>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="go">   Policies: load balancer</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="go">VirtualService: reviews</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="go">   1 HTTP route(s)</span>
 </code></pre></div>
-<p>The above output confirms that multiple subsets are defined, that a virtualservice is associated with the service in question, and that the load balancer policy was altered.</p>
+<p>The above output confirms that multiple subsets are defined, that a VirtualService is associated with the service in question, and that the load balancer policy was altered.</p>
 <h3 id="do-we-have-the-desired-behavior">Do we have the desired behavior?<a class="headerlink" href="#do-we-have-the-desired-behavior" title="Permanent link">&para;</a></h3>
 <p>Make repeated calls from <code>sleep</code> to the reviews service.  Do all requests go to v1?</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>deploy/sleep<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>curl<span class="w"> </span>-s<span class="w"> </span>reviews.default.svc.cluster.local:9080/reviews/123<span class="w">  </span><span class="p">|</span><span class="w"> </span>jq
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>deploy/sleep<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span>curl<span class="w"> </span>-s<span class="w"> </span>reviews.default.svc.cluster.local:9080/reviews/123<span class="w">  </span><span class="p">|</span><span class="w"> </span>jq
 </code></pre></div>
 <p>Note the value of <code>podname</code> in each response.  It should have the prefix <code>reviews-v1</code>.</p>
-<p>That ultimately is the evidence we're looking for.</p>
+<p>That, ultimately, is the evidence we're looking for.</p>
 <h3 id="inspect-the-envoy-configuration">Inspect the Envoy configuration<a class="headerlink" href="#inspect-the-envoy-configuration" title="Permanent link">&para;</a></h3>
 <p>We can ask the question:  how is <code>sleep</code> configured to route requests to the <code>reviews</code> service?</p>
-<p>We can ask Istio to show us the envoy configuration of the sidecar of the client, in this case <code>sleep</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>routes<span class="w"> </span>deploy/sleep<span class="w"> </span>--name<span class="w"> </span><span class="m">9080</span><span class="w"> </span>-o<span class="w"> </span>yaml
+<p>We can ask Istio to show us the Envoy configuration of the sidecar of the client, in this case <code>sleep</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>routes<span class="w"> </span>deploy/sleep<span class="w"> </span>--name<span class="w"> </span><span class="m">9080</span><span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
 <p>Here is the relevant section from the output:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-16-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-16-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-16-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-16-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-16-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-16-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-16-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-16-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-16-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-16-10">10</a></span>
-<span class="normal"><a href="#__codelineno-16-11">11</a></span>
-<span class="normal"><a href="#__codelineno-16-12">12</a></span>
-<span class="normal"><a href="#__codelineno-16-13">13</a></span>
-<span class="normal"><a href="#__codelineno-16-14">14</a></span>
-<span class="normal"><a href="#__codelineno-16-15">15</a></span>
-<span class="normal"><a href="#__codelineno-16-16">16</a></span>
-<span class="normal"><a href="#__codelineno-16-17">17</a></span>
-<span class="normal"><a href="#__codelineno-16-18">18</a></span>
-<span class="normal"><a href="#__codelineno-16-19">19</a></span>
-<span class="normal"><a href="#__codelineno-16-20">20</a></span>
-<span class="normal"><a href="#__codelineno-16-21">21</a></span>
-<span class="normal"><a href="#__codelineno-16-22">22</a></span>
-<span class="normal"><a href="#__codelineno-16-23">23</a></span>
-<span class="normal"><a href="#__codelineno-16-24">24</a></span>
-<span class="normal"><a href="#__codelineno-16-25">25</a></span>
-<span class="normal"><a href="#__codelineno-16-26">26</a></span>
-<span class="normal"><a href="#__codelineno-16-27">27</a></span>
-<span class="normal"><a href="#__codelineno-16-28">28</a></span>
-<span class="normal"><a href="#__codelineno-16-29">29</a></span>
-<span class="normal"><a href="#__codelineno-16-30">30</a></span>
-<span class="normal"><a href="#__codelineno-16-31">31</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">domains</span><span class="p">:</span>
-<a id="__codelineno-16-2" name="__codelineno-16-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews.default.svc.cluster.local</span>
-<a id="__codelineno-16-3" name="__codelineno-16-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews</span>
-<a id="__codelineno-16-4" name="__codelineno-16-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews.default.svc</span>
-<a id="__codelineno-16-5" name="__codelineno-16-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews.default</span>
-<a id="__codelineno-16-6" name="__codelineno-16-6"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.43.207.109</span>
-<a id="__codelineno-16-7" name="__codelineno-16-7"></a><span class="w">  </span><span class="nt">includeRequestAttemptCount</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<a id="__codelineno-16-8" name="__codelineno-16-8"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews.default.svc.cluster.local:9080</span>
-<a id="__codelineno-16-9" name="__codelineno-16-9"></a><span class="w">  </span><span class="nt">routes</span><span class="p">:</span>
-<a id="__codelineno-16-10" name="__codelineno-16-10"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">decorator</span><span class="p">:</span>
-<a id="__codelineno-16-11" name="__codelineno-16-11"></a><span class="w">      </span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews.default.svc.cluster.local:9080/*</span>
-<a id="__codelineno-16-12" name="__codelineno-16-12"></a><span class="w">    </span><span class="nt">match</span><span class="p">:</span>
-<a id="__codelineno-16-13" name="__codelineno-16-13"></a><span class="w">      </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/</span>
-<a id="__codelineno-16-14" name="__codelineno-16-14"></a><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
-<a id="__codelineno-16-15" name="__codelineno-16-15"></a><span class="w">      </span><span class="nt">filterMetadata</span><span class="p">:</span>
-<a id="__codelineno-16-16" name="__codelineno-16-16"></a><span class="w">        </span><span class="nt">istio</span><span class="p">:</span>
-<a id="__codelineno-16-17" name="__codelineno-16-17"></a><span class="w">          </span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/apis/networking.istio.io/v1alpha3/namespaces/default/virtual-service/reviews</span>
-<a id="__codelineno-16-18" name="__codelineno-16-18"></a><span class="w">    </span><span class="nt">route</span><span class="p">:</span>
-<a id="__codelineno-16-19" name="__codelineno-16-19"></a><span class="hll"><span class="w">      </span><span class="nt">cluster</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outbound|9080|v1|reviews.default.svc.cluster.local</span>
-</span><a id="__codelineno-16-20" name="__codelineno-16-20"></a><span class="w">      </span><span class="nt">maxGrpcTimeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0s</span>
-<a id="__codelineno-16-21" name="__codelineno-16-21"></a><span class="w">      </span><span class="nt">retryPolicy</span><span class="p">:</span>
-<a id="__codelineno-16-22" name="__codelineno-16-22"></a><span class="w">        </span><span class="nt">hostSelectionRetryMaxAttempts</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;5&quot;</span>
-<a id="__codelineno-16-23" name="__codelineno-16-23"></a><span class="w">        </span><span class="nt">numRetries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<a id="__codelineno-16-24" name="__codelineno-16-24"></a><span class="w">        </span><span class="nt">retriableStatusCodes</span><span class="p">:</span>
-<a id="__codelineno-16-25" name="__codelineno-16-25"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">503</span>
-<a id="__codelineno-16-26" name="__codelineno-16-26"></a><span class="w">        </span><span class="nt">retryHostPredicate</span><span class="p">:</span>
-<a id="__codelineno-16-27" name="__codelineno-16-27"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">envoy.retry_host_predicates.previous_hosts</span>
-<a id="__codelineno-16-28" name="__codelineno-16-28"></a><span class="w">          </span><span class="nt">typedConfig</span><span class="p">:</span>
-<a id="__codelineno-16-29" name="__codelineno-16-29"></a><span class="w">            </span><span class="s">&#39;@type&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type.googleapis.com/envoy.extensions.retry.host.previous_hosts.v3.PreviousHostsPredicate</span>
-<a id="__codelineno-16-30" name="__codelineno-16-30"></a><span class="w">        </span><span class="nt">retryOn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">connect-failure,refused-stream,unavailable,cancelled,retriable-status-codes</span>
-<a id="__codelineno-16-31" name="__codelineno-16-31"></a><span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0s</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-18-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-18-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-18-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-18-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-18-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-18-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-18-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-18-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-18-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-18-10">10</a></span>
+<span class="normal"><a href="#__codelineno-18-11">11</a></span>
+<span class="normal"><a href="#__codelineno-18-12">12</a></span>
+<span class="normal"><a href="#__codelineno-18-13">13</a></span>
+<span class="normal"><a href="#__codelineno-18-14">14</a></span>
+<span class="normal"><a href="#__codelineno-18-15">15</a></span>
+<span class="normal"><a href="#__codelineno-18-16">16</a></span>
+<span class="normal"><a href="#__codelineno-18-17">17</a></span>
+<span class="normal"><a href="#__codelineno-18-18">18</a></span>
+<span class="normal"><a href="#__codelineno-18-19">19</a></span>
+<span class="normal"><a href="#__codelineno-18-20">20</a></span>
+<span class="normal"><a href="#__codelineno-18-21">21</a></span>
+<span class="normal"><a href="#__codelineno-18-22">22</a></span>
+<span class="normal"><a href="#__codelineno-18-23">23</a></span>
+<span class="normal"><a href="#__codelineno-18-24">24</a></span>
+<span class="normal"><a href="#__codelineno-18-25">25</a></span>
+<span class="normal"><a href="#__codelineno-18-26">26</a></span>
+<span class="normal"><a href="#__codelineno-18-27">27</a></span>
+<span class="normal"><a href="#__codelineno-18-28">28</a></span>
+<span class="normal"><a href="#__codelineno-18-29">29</a></span>
+<span class="normal"><a href="#__codelineno-18-30">30</a></span>
+<span class="normal"><a href="#__codelineno-18-31">31</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">domains</span><span class="p">:</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews.default.svc.cluster.local</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews.default.svc</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews.default</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10.43.207.109</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7"></a><span class="w">  </span><span class="nt">includeRequestAttemptCount</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews.default.svc.cluster.local:9080</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9"></a><span class="w">  </span><span class="nt">routes</span><span class="p">:</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">decorator</span><span class="p">:</span>
+<a id="__codelineno-18-11" name="__codelineno-18-11"></a><span class="w">      </span><span class="nt">operation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews.default.svc.cluster.local:9080/*</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12"></a><span class="w">    </span><span class="nt">match</span><span class="p">:</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13"></a><span class="w">      </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/</span>
+<a id="__codelineno-18-14" name="__codelineno-18-14"></a><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15"></a><span class="w">      </span><span class="nt">filterMetadata</span><span class="p">:</span>
+<a id="__codelineno-18-16" name="__codelineno-18-16"></a><span class="w">        </span><span class="nt">istio</span><span class="p">:</span>
+<a id="__codelineno-18-17" name="__codelineno-18-17"></a><span class="w">          </span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/apis/networking.istio.io/v1alpha3/namespaces/default/virtual-service/reviews</span>
+<a id="__codelineno-18-18" name="__codelineno-18-18"></a><span class="w">    </span><span class="nt">route</span><span class="p">:</span>
+<a id="__codelineno-18-19" name="__codelineno-18-19"></a><span class="hll"><span class="w">      </span><span class="nt">cluster</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">outbound|9080|v1|reviews.default.svc.cluster.local</span>
+</span><a id="__codelineno-18-20" name="__codelineno-18-20"></a><span class="w">      </span><span class="nt">maxGrpcTimeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0s</span>
+<a id="__codelineno-18-21" name="__codelineno-18-21"></a><span class="w">      </span><span class="nt">retryPolicy</span><span class="p">:</span>
+<a id="__codelineno-18-22" name="__codelineno-18-22"></a><span class="w">        </span><span class="nt">hostSelectionRetryMaxAttempts</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;5&quot;</span>
+<a id="__codelineno-18-23" name="__codelineno-18-23"></a><span class="w">        </span><span class="nt">numRetries</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<a id="__codelineno-18-24" name="__codelineno-18-24"></a><span class="w">        </span><span class="nt">retriableStatusCodes</span><span class="p">:</span>
+<a id="__codelineno-18-25" name="__codelineno-18-25"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">503</span>
+<a id="__codelineno-18-26" name="__codelineno-18-26"></a><span class="w">        </span><span class="nt">retryHostPredicate</span><span class="p">:</span>
+<a id="__codelineno-18-27" name="__codelineno-18-27"></a><span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">envoy.retry_host_predicates.previous_hosts</span>
+<a id="__codelineno-18-28" name="__codelineno-18-28"></a><span class="w">          </span><span class="nt">typedConfig</span><span class="p">:</span>
+<a id="__codelineno-18-29" name="__codelineno-18-29"></a><span class="w">            </span><span class="s">&#39;@type&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type.googleapis.com/envoy.extensions.retry.host.previous_hosts.v3.PreviousHostsPredicate</span>
+<a id="__codelineno-18-30" name="__codelineno-18-30"></a><span class="w">        </span><span class="nt">retryOn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">connect-failure,refused-stream,unavailable,cancelled,retriable-status-codes</span>
+<a id="__codelineno-18-31" name="__codelineno-18-31"></a><span class="w">      </span><span class="nt">timeout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0s</span>
 </code></pre></div></td></tr></table></div>
 <p>On line 19, the cluster reference is to the subset "v1".</p>
 <p>Understanding Envoy, how it's designed and configured, can go a long way to helping understand how to read these configuration files, and knowing where to look.</p>
-<p>Here is another example:  how can we verify that the load balancer policy specified in the destination rule has been applied?</p>
-<p>That policy is associated with the destination service, which envoy calls a "cluster".</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>cluster<span class="w"> </span>deploy/sleep<span class="w"> </span>--fqdn<span class="w"> </span>reviews.default.svc.cluster.local<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>lbPolicy
+<h4 id="another-example">Another example<a class="headerlink" href="#another-example" title="Permanent link">&para;</a></h4>
+<p>How can we verify that the load balancer policy specified in the DestinationRule has been applied?</p>
+<p>That policy is associated with the destination service, which Envoy calls a "cluster".</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>cluster<span class="w"> </span>deploy/sleep<span class="w"> </span>--fqdn<span class="w"> </span>reviews.default.svc.cluster.local<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>lbPolicy
 </code></pre></div>
 <p>Is the value "RANDOM"?  It should match what we specified in the DestinationRule.
 There are four lbPolicies, one for each subset (v1, v2, v3, plus the top-level service).</p>
@@ -909,110 +1007,229 @@ What lbPolicy is used for calls to that destination?</p>
 <p>We will revisit the <code>istioctl proxy-config</code> command in subsequent scenarios.</p>
 <p>The page titled <a href="https://istio.io/latest/docs/ops/diagnostic-tools/proxy-cmd/">Debugging Envoy and Istiod</a> does a great job of explaining the <code>istioctl proxy-config</code> command in more detail.</p>
 <h2 id="using-the-correct-workload-selector">Using the correct workload selector<a class="headerlink" href="#using-the-correct-workload-selector" title="Permanent link">&para;</a></h2>
-<p><a href="https://istio.io/latest/docs/reference/config/type/workload-selector/#WorkloadSelector">Workload selectors</a> feature in the configuration of many Istio resources.  They are used to specify which envoy proxies to target, for different purposes.</p>
+<p><a href="https://istio.io/latest/docs/reference/config/type/workload-selector/#WorkloadSelector">Workload selectors</a> feature in the configuration of many Istio resources.  They are used to specify which Envoy proxies to target, for different purposes.</p>
 <p>For example, an <a href="https://istio.io/latest/docs/reference/config/networking/envoy-filter/">EnvoyFilter</a> uses workload selectors to identify which proxies to program.
 An <a href="https://istio.io/latest/docs/reference/config/security/authorization-policy/">AuthorizationPolicy</a> uses workload selectors to target the sidecars that control access to their workloads.</p>
-<p>Apply the following authorization policy, designed to allow only the <code>productpage</code> service to call the reviews service:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/authz-policy-reviews.yaml
+<p>Apply the following authorization policy, designed to allow only the <code>productpage</code> service to call the <code>reviews</code> service:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/authz-policy-reviews.yaml
 </code></pre></div>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-21-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-21-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-21-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-21-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-21-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-21-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-21-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-21-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-21-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-21-10">10</a></span>
+<span class="normal"><a href="#__codelineno-21-11">11</a></span>
+<span class="normal"><a href="#__codelineno-21-12">12</a></span>
+<span class="normal"><a href="#__codelineno-21-13">13</a></span>
+<span class="normal"><a href="#__codelineno-21-14">14</a></span>
+<span class="normal"><a href="#__codelineno-21-15">15</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1"></a><span class="nn">---</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">security.istio.io/v1beta1</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">AuthorizationPolicy</span>
+<a id="__codelineno-21-4" name="__codelineno-21-4"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">allowed-reviews-clients</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8"></a><span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9"></a><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviewss</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11"></a><span class="w">  </span><span class="nt">action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ALLOW</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12"></a><span class="w">  </span><span class="nt">rules</span><span class="p">:</span>
+<a id="__codelineno-21-13" name="__codelineno-21-13"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">from</span><span class="p">:</span>
+<a id="__codelineno-21-14" name="__codelineno-21-14"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">source</span><span class="p">:</span>
+<a id="__codelineno-21-15" name="__codelineno-21-15"></a><span class="w">        </span><span class="nt">principals</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;cluster.local/ns/default/sa/bookinfo-productpage&quot;</span><span class="p p-Indicator">]</span>
+</code></pre></div></td></tr></table></div>
 <p>Verify that other workloads, say <code>sleep</code>, can now no longer call reviews:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>deploy/sleep<span class="w"> </span>--<span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span>http://reviews:9080/reviews/123
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>deploy/sleep<span class="w"> </span>--<span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span>http://reviews:9080/reviews/123
 </code></pre></div>
 <p>Was the request denied?</p>
 <p>Run analyze:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>istioctl<span class="w"> </span>analyze
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>istioctl<span class="w"> </span>analyze
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="go">Warning [IST0127] (AuthorizationPolicy default/allowed-reviews-clients) No matching workloads for this resource with the following labels: app=reviewss</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="go">Warning [IST0127] (AuthorizationPolicy default/allowed-reviews-clients) No matching workloads for this resource with the following labels: app=reviewss</span>
 </code></pre></div>
 <p>Run the following command, which lists all authorization policies that applies to the reviews service:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>istioctl<span class="w"> </span>x<span class="w"> </span>authz<span class="w"> </span>check<span class="w"> </span>svc/reviews
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>istioctl<span class="w"> </span>x<span class="w"> </span>authz<span class="w"> </span>check<span class="w"> </span>svc/reviews
 </code></pre></div>
 <p>Do any rules show up in the output?</p>
 <p>It seems we have a typo in the workload selector, in the value specified for the label:  <code>reviewss</code> instead of <code>reviews</code>.</p>
 <p>Fix the authorization policy to use the correctly-spelled label.</p>
 <p>Now re-run analyze:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>istioctl<span class="w"> </span>analyze
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>istioctl<span class="w"> </span>analyze
 </code></pre></div>
 <p>The validation issues should have gone away.</p>
 <p>Try the authz check again:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>istioctl<span class="w"> </span>x<span class="w"> </span>authz<span class="w"> </span>check<span class="w"> </span>svc/reviews
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>istioctl<span class="w"> </span>x<span class="w"> </span>authz<span class="w"> </span>check<span class="w"> </span>svc/reviews
 </code></pre></div>
 <p>There should now be a matching policy in the output.</p>
 <p>Finally, try to call reviews from sleep again:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>deploy/sleep<span class="w"> </span>--<span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span>http://reviews:9080/reviews/123
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>deploy/sleep<span class="w"> </span>--<span class="w"> </span>curl<span class="w"> </span>-s<span class="w"> </span>http://reviews:9080/reviews/123
 </code></pre></div>
 <p>This time the response should say <code>RBAC: access denied</code>.</p>
 <p>We can look at the configuration of the inbound listener on the sidecar associated with the <code>reviews-v1</code> workload:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>listener<span class="w"> </span>deploy/reviews-v1<span class="w"> </span>--port<span class="w"> </span><span class="m">15006</span><span class="w"> </span>-o<span class="w"> </span>yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>listener<span class="w"> </span>deploy/reviews-v1<span class="w"> </span>--port<span class="w"> </span><span class="m">15006</span><span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
 <p>The output is quite lengthy.  Here is the relevant portion, showing the <a href="https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/rbac_filter">Envoy RBAC filter</a> present in the filter chain, and configured to allow <code>productpage</code> through:</p>
-<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-27-1"> 1</a></span>
-<span class="normal"><a href="#__codelineno-27-2"> 2</a></span>
-<span class="normal"><a href="#__codelineno-27-3"> 3</a></span>
-<span class="normal"><a href="#__codelineno-27-4"> 4</a></span>
-<span class="normal"><a href="#__codelineno-27-5"> 5</a></span>
-<span class="normal"><a href="#__codelineno-27-6"> 6</a></span>
-<span class="normal"><a href="#__codelineno-27-7"> 7</a></span>
-<span class="normal"><a href="#__codelineno-27-8"> 8</a></span>
-<span class="normal"><a href="#__codelineno-27-9"> 9</a></span>
-<span class="normal"><a href="#__codelineno-27-10">10</a></span>
-<span class="normal"><a href="#__codelineno-27-11">11</a></span>
-<span class="normal"><a href="#__codelineno-27-12">12</a></span>
-<span class="normal"><a href="#__codelineno-27-13">13</a></span>
-<span class="normal"><a href="#__codelineno-27-14">14</a></span>
-<span class="normal"><a href="#__codelineno-27-15">15</a></span>
-<span class="normal"><a href="#__codelineno-27-16">16</a></span>
-<span class="normal"><a href="#__codelineno-27-17">17</a></span>
-<span class="normal"><a href="#__codelineno-27-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">envoy.filters.http.rbac</span>
-<a id="__codelineno-27-2" name="__codelineno-27-2"></a><span class="w">  </span><span class="nt">typedConfig</span><span class="p">:</span>
-<a id="__codelineno-27-3" name="__codelineno-27-3"></a><span class="w">    </span><span class="s">&#39;@type&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBAC</span>
-<a id="__codelineno-27-4" name="__codelineno-27-4"></a><span class="w">    </span><span class="nt">rules</span><span class="p">:</span>
-<a id="__codelineno-27-5" name="__codelineno-27-5"></a><span class="w">      </span><span class="nt">policies</span><span class="p">:</span>
-<a id="__codelineno-27-6" name="__codelineno-27-6"></a><span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">ns[default]-policy[allowed-reviews-clients]-rule[0]</span><span class="p p-Indicator">:</span>
-<a id="__codelineno-27-7" name="__codelineno-27-7"></a><span class="w">          </span><span class="nt">permissions</span><span class="p">:</span>
-<a id="__codelineno-27-8" name="__codelineno-27-8"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">andRules</span><span class="p">:</span>
-<a id="__codelineno-27-9" name="__codelineno-27-9"></a><span class="w">              </span><span class="nt">rules</span><span class="p">:</span>
-<a id="__codelineno-27-10" name="__codelineno-27-10"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">any</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<a id="__codelineno-27-11" name="__codelineno-27-11"></a><span class="w">          </span><span class="nt">principals</span><span class="p">:</span>
-<a id="__codelineno-27-12" name="__codelineno-27-12"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">andIds</span><span class="p">:</span>
-<a id="__codelineno-27-13" name="__codelineno-27-13"></a><span class="w">              </span><span class="nt">ids</span><span class="p">:</span>
-<a id="__codelineno-27-14" name="__codelineno-27-14"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">orIds</span><span class="p">:</span>
-<a id="__codelineno-27-15" name="__codelineno-27-15"></a><span class="w">                  </span><span class="nt">ids</span><span class="p">:</span>
-<a id="__codelineno-27-16" name="__codelineno-27-16"></a><span class="w">                  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">authenticated</span><span class="p">:</span>
-<a id="__codelineno-27-17" name="__codelineno-27-17"></a><span class="w">                      </span><span class="nt">principalName</span><span class="p">:</span>
-<a id="__codelineno-27-18" name="__codelineno-27-18"></a><span class="w">                        </span><span class="nt">exact</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spiffe://cluster.local/ns/default/sa/bookinfo-productpage</span>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-30-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-30-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-30-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-30-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-30-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-30-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-30-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-30-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-30-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-30-10">10</a></span>
+<span class="normal"><a href="#__codelineno-30-11">11</a></span>
+<span class="normal"><a href="#__codelineno-30-12">12</a></span>
+<span class="normal"><a href="#__codelineno-30-13">13</a></span>
+<span class="normal"><a href="#__codelineno-30-14">14</a></span>
+<span class="normal"><a href="#__codelineno-30-15">15</a></span>
+<span class="normal"><a href="#__codelineno-30-16">16</a></span>
+<span class="normal"><a href="#__codelineno-30-17">17</a></span>
+<span class="normal"><a href="#__codelineno-30-18">18</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">envoy.filters.http.rbac</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2"></a><span class="w">  </span><span class="nt">typedConfig</span><span class="p">:</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3"></a><span class="w">    </span><span class="s">&#39;@type&#39;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBAC</span>
+<a id="__codelineno-30-4" name="__codelineno-30-4"></a><span class="w">    </span><span class="nt">rules</span><span class="p">:</span>
+<a id="__codelineno-30-5" name="__codelineno-30-5"></a><span class="w">      </span><span class="nt">policies</span><span class="p">:</span>
+<a id="__codelineno-30-6" name="__codelineno-30-6"></a><span class="w">        </span><span class="l l-Scalar l-Scalar-Plain">ns[default]-policy[allowed-reviews-clients]-rule[0]</span><span class="p p-Indicator">:</span>
+<a id="__codelineno-30-7" name="__codelineno-30-7"></a><span class="w">          </span><span class="nt">permissions</span><span class="p">:</span>
+<a id="__codelineno-30-8" name="__codelineno-30-8"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">andRules</span><span class="p">:</span>
+<a id="__codelineno-30-9" name="__codelineno-30-9"></a><span class="w">              </span><span class="nt">rules</span><span class="p">:</span>
+<a id="__codelineno-30-10" name="__codelineno-30-10"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">any</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<a id="__codelineno-30-11" name="__codelineno-30-11"></a><span class="w">          </span><span class="nt">principals</span><span class="p">:</span>
+<a id="__codelineno-30-12" name="__codelineno-30-12"></a><span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">andIds</span><span class="p">:</span>
+<a id="__codelineno-30-13" name="__codelineno-30-13"></a><span class="w">              </span><span class="nt">ids</span><span class="p">:</span>
+<a id="__codelineno-30-14" name="__codelineno-30-14"></a><span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">orIds</span><span class="p">:</span>
+<a id="__codelineno-30-15" name="__codelineno-30-15"></a><span class="w">                  </span><span class="nt">ids</span><span class="p">:</span>
+<a id="__codelineno-30-16" name="__codelineno-30-16"></a><span class="w">                  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">authenticated</span><span class="p">:</span>
+<a id="__codelineno-30-17" name="__codelineno-30-17"></a><span class="w">                      </span><span class="nt">principalName</span><span class="p">:</span>
+<a id="__codelineno-30-18" name="__codelineno-30-18"></a><span class="w">                        </span><span class="nt">exact</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spiffe://cluster.local/ns/default/sa/bookinfo-productpage</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="ingress-gateways">Ingress Gateways<a class="headerlink" href="#ingress-gateways" title="Permanent link">&para;</a></h2>
-<p>Let's explore troubleshooting issues with ingress configuration.</p>
+<p>Explore troubleshooting issues with ingress configuration.</p>
 <p>Apply the following resource to the cluster:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/bookinfo-gateway.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>artifacts/mesh-config/bookinfo-gateway.yaml
 </code></pre></div>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-32-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-32-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-32-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-32-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-32-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-32-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-32-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-32-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-32-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-32-10">10</a></span>
+<span class="normal"><a href="#__codelineno-32-11">11</a></span>
+<span class="normal"><a href="#__codelineno-32-12">12</a></span>
+<span class="normal"><a href="#__codelineno-32-13">13</a></span>
+<span class="normal"><a href="#__codelineno-32-14">14</a></span>
+<span class="normal"><a href="#__codelineno-32-15">15</a></span>
+<span class="normal"><a href="#__codelineno-32-16">16</a></span>
+<span class="normal"><a href="#__codelineno-32-17">17</a></span>
+<span class="normal"><a href="#__codelineno-32-18">18</a></span>
+<span class="normal"><a href="#__codelineno-32-19">19</a></span>
+<span class="normal"><a href="#__codelineno-32-20">20</a></span>
+<span class="normal"><a href="#__codelineno-32-21">21</a></span>
+<span class="normal"><a href="#__codelineno-32-22">22</a></span>
+<span class="normal"><a href="#__codelineno-32-23">23</a></span>
+<span class="normal"><a href="#__codelineno-32-24">24</a></span>
+<span class="normal"><a href="#__codelineno-32-25">25</a></span>
+<span class="normal"><a href="#__codelineno-32-26">26</a></span>
+<span class="normal"><a href="#__codelineno-32-27">27</a></span>
+<span class="normal"><a href="#__codelineno-32-28">28</a></span>
+<span class="normal"><a href="#__codelineno-32-29">29</a></span>
+<span class="normal"><a href="#__codelineno-32-30">30</a></span>
+<span class="normal"><a href="#__codelineno-32-31">31</a></span>
+<span class="normal"><a href="#__codelineno-32-32">32</a></span>
+<span class="normal"><a href="#__codelineno-32-33">33</a></span>
+<span class="normal"><a href="#__codelineno-32-34">34</a></span>
+<span class="normal"><a href="#__codelineno-32-35">35</a></span>
+<span class="normal"><a href="#__codelineno-32-36">36</a></span>
+<span class="normal"><a href="#__codelineno-32-37">37</a></span>
+<span class="normal"><a href="#__codelineno-32-38">38</a></span>
+<span class="normal"><a href="#__codelineno-32-39">39</a></span>
+<span class="normal"><a href="#__codelineno-32-40">40</a></span>
+<span class="normal"><a href="#__codelineno-32-41">41</a></span>
+<span class="normal"><a href="#__codelineno-32-42">42</a></span>
+<span class="normal"><a href="#__codelineno-32-43">43</a></span>
+<span class="normal"><a href="#__codelineno-32-44">44</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1"></a><span class="nn">---</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1alpha3</span>
+<a id="__codelineno-32-3" name="__codelineno-32-3"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Gateway</span>
+<a id="__codelineno-32-4" name="__codelineno-32-4"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-32-5" name="__codelineno-32-5"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bookinfo-gateway</span>
+<a id="__codelineno-32-6" name="__codelineno-32-6"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-32-7" name="__codelineno-32-7"></a><span class="w">  </span><span class="c1"># The selector matches the ingress gateway pod labels.</span>
+<a id="__codelineno-32-8" name="__codelineno-32-8"></a><span class="w">  </span><span class="c1"># If you installed Istio using Helm following the standard documentation, this would be &quot;istio=ingress&quot;</span>
+<a id="__codelineno-32-9" name="__codelineno-32-9"></a><span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<a id="__codelineno-32-10" name="__codelineno-32-10"></a><span class="w">    </span><span class="nt">istio</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ingressgateway</span><span class="w"> </span><span class="c1"># use istio default controller</span>
+<a id="__codelineno-32-11" name="__codelineno-32-11"></a><span class="w">  </span><span class="nt">servers</span><span class="p">:</span>
+<a id="__codelineno-32-12" name="__codelineno-32-12"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">port</span><span class="p">:</span>
+<a id="__codelineno-32-13" name="__codelineno-32-13"></a><span class="w">      </span><span class="nt">number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8080</span>
+<a id="__codelineno-32-14" name="__codelineno-32-14"></a><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http</span>
+<a id="__codelineno-32-15" name="__codelineno-32-15"></a><span class="w">      </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HTTP</span>
+<a id="__codelineno-32-16" name="__codelineno-32-16"></a><span class="w">    </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-32-17" name="__codelineno-32-17"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
+<a id="__codelineno-32-18" name="__codelineno-32-18"></a><span class="nn">---</span>
+<a id="__codelineno-32-19" name="__codelineno-32-19"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1alpha3</span>
+<a id="__codelineno-32-20" name="__codelineno-32-20"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VirtualService</span>
+<a id="__codelineno-32-21" name="__codelineno-32-21"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-32-22" name="__codelineno-32-22"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bookinfo</span>
+<a id="__codelineno-32-23" name="__codelineno-32-23"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-32-24" name="__codelineno-32-24"></a><span class="w">  </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-32-25" name="__codelineno-32-25"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
+<a id="__codelineno-32-26" name="__codelineno-32-26"></a><span class="w">  </span><span class="nt">gateways</span><span class="p">:</span>
+<a id="__codelineno-32-27" name="__codelineno-32-27"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bookinfo-gateway</span>
+<a id="__codelineno-32-28" name="__codelineno-32-28"></a><span class="w">  </span><span class="nt">http</span><span class="p">:</span>
+<a id="__codelineno-32-29" name="__codelineno-32-29"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">match</span><span class="p">:</span>
+<a id="__codelineno-32-30" name="__codelineno-32-30"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uri</span><span class="p">:</span>
+<a id="__codelineno-32-31" name="__codelineno-32-31"></a><span class="w">        </span><span class="nt">exact</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/productpage</span>
+<a id="__codelineno-32-32" name="__codelineno-32-32"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uri</span><span class="p">:</span>
+<a id="__codelineno-32-33" name="__codelineno-32-33"></a><span class="w">        </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/static</span>
+<a id="__codelineno-32-34" name="__codelineno-32-34"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uri</span><span class="p">:</span>
+<a id="__codelineno-32-35" name="__codelineno-32-35"></a><span class="w">        </span><span class="nt">exact</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/login</span>
+<a id="__codelineno-32-36" name="__codelineno-32-36"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uri</span><span class="p">:</span>
+<a id="__codelineno-32-37" name="__codelineno-32-37"></a><span class="w">        </span><span class="nt">exact</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/logout</span>
+<a id="__codelineno-32-38" name="__codelineno-32-38"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uri</span><span class="p">:</span>
+<a id="__codelineno-32-39" name="__codelineno-32-39"></a><span class="w">        </span><span class="nt">prefix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/api/v1/products</span>
+<a id="__codelineno-32-40" name="__codelineno-32-40"></a><span class="w">    </span><span class="nt">route</span><span class="p">:</span>
+<a id="__codelineno-32-41" name="__codelineno-32-41"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">destination</span><span class="p">:</span>
+<a id="__codelineno-32-42" name="__codelineno-32-42"></a><span class="w">        </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">productpage</span>
+<a id="__codelineno-32-43" name="__codelineno-32-43"></a><span class="w">        </span><span class="nt">port</span><span class="p">:</span>
+<a id="__codelineno-32-44" name="__codelineno-32-44"></a><span class="w">          </span><span class="nt">number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">9080</span>
+</code></pre></div></td></tr></table></div>
 <p><code>bookinfo-gateway.yaml</code> configures both a <a href="https://istio.io/latest/docs/reference/config/networking/gateway/">Gateway</a> resource and a VirtualService to route incoming traffic to the <code>productpage</code> app.</p>
 <p>Assuming the local cluster deployed with k3d in <a href="../setup/#kubernetes">setup</a>, the ingress gateway is reachable on localhost, port 80:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GATEWAY_IP</span><span class="o">=</span>localhost
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GATEWAY_IP</span><span class="o">=</span>localhost
 </code></pre></div>
 <p>Then:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>curl<span class="w"> </span>http://<span class="nv">$GATEWAY_IP</span>/productpage
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>curl<span class="w"> </span>http://<span class="nv">$GATEWAY_IP</span>/productpage
 </code></pre></div>
 <p>There are many opportunities for misconfiguration:</p>
 <ol>
 <li>
 <p>The Gateway selector that selects the ingress gateway.</p>
-<p>If for example we get the selector wrong, running <code>istioctl analyze</code> will catch the invalid reference:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="go">Error [IST0101] (Gateway default/bookinfo-gateway) Referenced selector not found: &quot;istio=ingressgateways&quot;</span>
+<p>If for example we get the selector wrong (edit the value to "ingressgateways"), running <code>istioctl analyze</code> will catch the invalid reference:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="go">Error [IST0101] (Gateway default/bookinfo-gateway) Referenced selector not found: &quot;istio=ingressgateways&quot;</span>
 </code></pre></div>
 </li>
 <li>
 <p>The VirtualService that references the gateway.</p>
-<p>Here too <code>istioctl analyze</code> will catch the invalid reference:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="go">Error [IST0101] (VirtualService default/bookinfo) Referenced gateway not found: &quot;bookinfo-gateways&quot;</span>
-<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="go">Warning [IST0132] (VirtualService default/bookinfo) one or more host [*] defined in VirtualService default/bookinfo not found in Gateway default/bookinfo-gateways.</span>
+<p>Edit the gateway name to "bookinfo-gateways".
+Here too <code>istioctl analyze</code> will catch the invalid reference:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="go">Error [IST0101] (VirtualService default/bookinfo) Referenced gateway not found: &quot;bookinfo-gateways&quot;</span>
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="go">Warning [IST0132] (VirtualService default/bookinfo) one or more host [*] defined in VirtualService default/bookinfo not found in Gateway default/bookinfo-gateways.</span>
 </code></pre></div>
 </li>
 <li>
 <p>The routing rule with the destination workload name and port.</p>
 <p>Mistype the destination workload and watch <code>istioctl analyze</code> catch that too:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="go">Error [IST0101] (VirtualService default/bookinfo) Referenced host not found: &quot;productpages&quot;</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="go">Error [IST0101] (VirtualService default/bookinfo) Referenced host not found: &quot;productpages&quot;</span>
 </code></pre></div>
 </li>
 </ol>

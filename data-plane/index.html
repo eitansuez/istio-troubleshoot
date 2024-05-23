@@ -544,7 +544,7 @@
 <h1 id="the-data-plane">The data plane<a class="headerlink" href="#the-data-plane" title="Permanent link">&para;</a></h1>
 <p>In the previous exploration we looked at issues relating to misconfiguration.</p>
 <p>In this exploration, we investigate issues with the data plane:  everything is configured correctly, but some traffic flow isn't functioning, and we need to find out why.</p>
-<p>We have ingress configured for the bookinfo application, routing requests to the <code>productpage</code> destination.</p>
+<p>Ingress is configured for the <code>bookinfo</code> application, routing requests to the <code>productpage</code> destination.</p>
 <p>Assuming the local cluster deployed with k3d in <a href="../setup/#kubernetes">setup</a>, the ingress gateway is reachable on localhost, port 80:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">GATEWAY_IP</span><span class="o">=</span>localhost
 </code></pre></div>
@@ -610,39 +610,41 @@
 <span class="normal"><a href="#__codelineno-9-30">30</a></span>
 <span class="normal"><a href="#__codelineno-9-31">31</a></span>
 <span class="normal"><a href="#__codelineno-9-32">32</a></span>
-<span class="normal"><a href="#__codelineno-9-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1alpha3</span>
-<a id="__codelineno-9-2" name="__codelineno-9-2"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Gateway</span>
-<a id="__codelineno-9-3" name="__codelineno-9-3"></a><span class="nt">metadata</span><span class="p">:</span>
-<a id="__codelineno-9-4" name="__codelineno-9-4"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin-gateway</span>
-<a id="__codelineno-9-5" name="__codelineno-9-5"></a><span class="nt">spec</span><span class="p">:</span>
-<a id="__codelineno-9-6" name="__codelineno-9-6"></a><span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
-<a id="__codelineno-9-7" name="__codelineno-9-7"></a><span class="w">    </span><span class="nt">istio</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ingressgateway</span>
-<a id="__codelineno-9-8" name="__codelineno-9-8"></a><span class="w">  </span><span class="nt">servers</span><span class="p">:</span>
-<a id="__codelineno-9-9" name="__codelineno-9-9"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">port</span><span class="p">:</span>
-<a id="__codelineno-9-10" name="__codelineno-9-10"></a><span class="w">      </span><span class="nt">number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
-<a id="__codelineno-9-11" name="__codelineno-9-11"></a><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http</span>
-<a id="__codelineno-9-12" name="__codelineno-9-12"></a><span class="w">      </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HTTP</span>
-<a id="__codelineno-9-13" name="__codelineno-9-13"></a><span class="w">    </span><span class="nt">hosts</span><span class="p">:</span>
-<a id="__codelineno-9-14" name="__codelineno-9-14"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
-<a id="__codelineno-9-15" name="__codelineno-9-15"></a><span class="nn">---</span>
-<a id="__codelineno-9-16" name="__codelineno-9-16"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1alpha3</span>
-<a id="__codelineno-9-17" name="__codelineno-9-17"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VirtualService</span>
-<a id="__codelineno-9-18" name="__codelineno-9-18"></a><span class="nt">metadata</span><span class="p">:</span>
-<a id="__codelineno-9-19" name="__codelineno-9-19"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin</span>
-<a id="__codelineno-9-20" name="__codelineno-9-20"></a><span class="nt">spec</span><span class="p">:</span>
-<a id="__codelineno-9-21" name="__codelineno-9-21"></a><span class="w">  </span><span class="nt">hosts</span><span class="p">:</span>
-<a id="__codelineno-9-22" name="__codelineno-9-22"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
-<a id="__codelineno-9-23" name="__codelineno-9-23"></a><span class="w">  </span><span class="nt">gateways</span><span class="p">:</span>
-<a id="__codelineno-9-24" name="__codelineno-9-24"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin-gateway</span>
-<a id="__codelineno-9-25" name="__codelineno-9-25"></a><span class="w">  </span><span class="nt">http</span><span class="p">:</span>
-<a id="__codelineno-9-26" name="__codelineno-9-26"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">route</span><span class="p">:</span>
-<a id="__codelineno-9-27" name="__codelineno-9-27"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">destination</span><span class="p">:</span>
-<a id="__codelineno-9-28" name="__codelineno-9-28"></a><span class="w">        </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin</span>
-<a id="__codelineno-9-29" name="__codelineno-9-29"></a><span class="w">        </span><span class="nt">port</span><span class="p">:</span>
-<a id="__codelineno-9-30" name="__codelineno-9-30"></a><span class="w">          </span><span class="nt">number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8000</span>
-<a id="__codelineno-9-31" name="__codelineno-9-31"></a><span class="hll"><span class="w">    </span><span class="nt">retries</span><span class="p">:</span>
-</span><a id="__codelineno-9-32" name="__codelineno-9-32"></a><span class="hll"><span class="w">      </span><span class="nt">attempts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
-</span><a id="__codelineno-9-33" name="__codelineno-9-33"></a><span class="hll"><span class="w">      </span><span class="nt">retryOn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gateway-error,connect-failure,refused-stream</span>
+<span class="normal"><a href="#__codelineno-9-33">33</a></span>
+<span class="normal"><a href="#__codelineno-9-34">34</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1"></a><span class="nn">---</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1alpha3</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Gateway</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin-gateway</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7"></a><span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8"></a><span class="w">    </span><span class="nt">istio</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ingressgateway</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9"></a><span class="w">  </span><span class="nt">servers</span><span class="p">:</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">port</span><span class="p">:</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11"></a><span class="w">      </span><span class="nt">number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12"></a><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">http</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13"></a><span class="w">      </span><span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HTTP</span>
+<a id="__codelineno-9-14" name="__codelineno-9-14"></a><span class="w">    </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
+<a id="__codelineno-9-16" name="__codelineno-9-16"></a><span class="nn">---</span>
+<a id="__codelineno-9-17" name="__codelineno-9-17"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1alpha3</span>
+<a id="__codelineno-9-18" name="__codelineno-9-18"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">VirtualService</span>
+<a id="__codelineno-9-19" name="__codelineno-9-19"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-9-20" name="__codelineno-9-20"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin</span>
+<a id="__codelineno-9-21" name="__codelineno-9-21"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-9-22" name="__codelineno-9-22"></a><span class="w">  </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-9-23" name="__codelineno-9-23"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;*&quot;</span>
+<a id="__codelineno-9-24" name="__codelineno-9-24"></a><span class="w">  </span><span class="nt">gateways</span><span class="p">:</span>
+<a id="__codelineno-9-25" name="__codelineno-9-25"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin-gateway</span>
+<a id="__codelineno-9-26" name="__codelineno-9-26"></a><span class="w">  </span><span class="nt">http</span><span class="p">:</span>
+<a id="__codelineno-9-27" name="__codelineno-9-27"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">route</span><span class="p">:</span>
+<a id="__codelineno-9-28" name="__codelineno-9-28"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">destination</span><span class="p">:</span>
+<a id="__codelineno-9-29" name="__codelineno-9-29"></a><span class="w">        </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin</span>
+<a id="__codelineno-9-30" name="__codelineno-9-30"></a><span class="w">        </span><span class="nt">port</span><span class="p">:</span>
+<a id="__codelineno-9-31" name="__codelineno-9-31"></a><span class="w">          </span><span class="nt">number</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8000</span>
+<a id="__codelineno-9-32" name="__codelineno-9-32"></a><span class="hll"><span class="w">    </span><span class="nt">retries</span><span class="p">:</span>
+</span><a id="__codelineno-9-33" name="__codelineno-9-33"></a><span class="hll"><span class="w">      </span><span class="nt">attempts</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+</span><a id="__codelineno-9-34" name="__codelineno-9-34"></a><span class="hll"><span class="w">      </span><span class="nt">retryOn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gateway-error,connect-failure,refused-stream</span>
 </span></code></pre></div></td></tr></table></div>
 <p>The VirtualService is configured with three retry attempts in the event of a 503 response.</p>
 <p>Call the <code>httpbin</code> endpoint that returns a 503:</p>
@@ -655,13 +657,13 @@
 <p>Envoy's response flags provide insight into why a request to a target destination workload might have failed.</p>
 <h2 id="sidecar-logs">Sidecar logs<a class="headerlink" href="#sidecar-logs" title="Permanent link">&para;</a></h2>
 <p>We are not restricted to inspecting the logs of the ingress gateway.  We can also check the logs of the Envoy sidecars.</p>
-<p>Tail the logs for the sidecar of the httpbin destination workload:</p>
+<p>Tail the logs for the sidecar of the <code>httpbin</code> destination workload:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>logs<span class="w"> </span>--follow<span class="w"> </span>deploy/httpbin<span class="w"> </span>-c<span class="w"> </span>istio-proxy
 </code></pre></div>
-<p>Repeat the call to the httpbin 503 endpoint:</p>
+<p>Repeat the call to the <code>httpbin</code> "503" endpoint:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl<span class="w"> </span>http://<span class="nv">$GATEWAY_IP</span>/status/503
 </code></pre></div>
-<p>You will see four inbound requests received by the sidecar, i.e. 3 retry attempts.</p>
+<p>You will see evidence of four inbound requests received by the sidecar, i.e. three retry attempts.</p>
 <h2 id="log-levels">Log levels<a class="headerlink" href="#log-levels" title="Permanent link">&para;</a></h2>
 <p>The log level for any Envoy proxy can be either displayed or configured with the <a href="https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-proxy-config-log">proxy-config log command</a>.</p>
 <p>Envoy has many loggers.  The log level for each logger can be configured independently.</p>
@@ -669,11 +671,11 @@
 <p>To view the log levels for each logger, run:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>log<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span>deploy/istio-ingressgateway
 </code></pre></div>
-<p>The log levels are: trace, debug, info, warning, error, critical, and off.</p>
-<p>To set the log level for, say the wasm logger, to info:</p>
+<p>The log levels are: <code>trace</code>, <code>debug</code>, <code>info</code>, <code>warning</code>, <code>error</code>, <code>critical</code>, and <code>off</code>.</p>
+<p>To set the log level for, say the wasm logger, to <code>info</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>log<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span>deploy/istio-ingressgateway<span class="w"> </span>--level<span class="w"> </span>wasm:info
 </code></pre></div>
-<p>This can be useful for debugging wasm plugins (extensions).</p>
+<p>This can be useful for debugging wasm extensions.</p>
 <p>The output displays the updated logging levels for every logger for that Envoy instance.</p>
 <p>Log levels can be reset for all loggers with the <code>--reset</code> flag:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>istioctl<span class="w"> </span>proxy-config<span class="w"> </span>log<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span>deploy/istio-ingressgateway<span class="w"> </span>--reset

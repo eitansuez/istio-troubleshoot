@@ -303,11 +303,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      Objective
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#main-lesson" class="md-nav__link">
     <span class="md-ellipsis">
       Main lesson
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -596,11 +620,35 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      Objective
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Introduction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#main-lesson" class="md-nav__link">
     <span class="md-ellipsis">
       Main lesson
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -770,12 +818,11 @@
 
 
 <h1 id="sidecar-injection">Sidecar Injection<a class="headerlink" href="#sidecar-injection" title="Permanent link">&para;</a></h1>
-<p>The Istio documentation contains <a href="https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/">a guide on sidecar injection</a> that explains both:</p>
-<ul>
-<li>the mechanism for configuring sidecar injection, and</li>
-<li>the ways in which sidecar injection can be controlled.</li>
-</ul>
-<h2 id="main-lesson">Main lesson<a class="headerlink" href="#main-lesson" title="Permanent link">&para;</a></h2>
+<h2 id="objective">Objective<a class="headerlink" href="#objective" title="Permanent link">&para;</a></h2>
+<p>To explore troubleshooting issues relating to sidecar injection in Istio.</p>
+<h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
+<p>The Istio documentation contains <a href="https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/">a guide on sidecar injection</a> that explains the mechanism for configuring sidecar injection, and ways in which sidecar injection can be controlled.</p>
+<h3 id="main-lesson">Main lesson<a class="headerlink" href="#main-lesson" title="Permanent link">&para;</a></h3>
 <p>The most important thing to understand about sidecar injection is that <strong>it occurs at pod creation time</strong>.</p>
 <p>This means that <em>if you configure a pod or a namespace for sidecar injection, it won't affect any pods that are already running</em>.</p>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
@@ -793,12 +840,12 @@
 <p>Either:</p>
 <ul>
 <li>
-<p>delete the pod and let the deployment create a new one in its place:</p>
+<p>Delete the pod and let the deployment create a new one in its place:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>kubectl<span class="w"> </span>delete<span class="w"> </span>pod<span class="w"> </span>-l<span class="w"> </span><span class="nv">app</span><span class="o">=</span>httpbin
 </code></pre></div>
 </li>
 <li>
-<p>submit a command to the kube api server to restart the deployment</p>
+<p>Submit a command to the kube API server to restart the deployment:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deploy<span class="w"> </span>httpbin
 </code></pre></div>
 </li>
@@ -861,10 +908,10 @@ If the count still shows "1", it means that no additional proxies were deployed.
 </code></pre></div>
 <p>Look for a green checkmark under the INJECTED column.</p>
 <h2 id="consequences-of-a-missing-sidecar">Consequences of a missing sidecar<a class="headerlink" href="#consequences-of-a-missing-sidecar" title="Permanent link">&para;</a></h2>
-<p>Fundamentally, a missing sidecar means that all traffic in and out of the pod will not be governed by Istio.</p>
+<p>Fundamentally, a missing sidecar means that all traffic in and out of the pod will not be controlled by Istio.</p>
 <p>This implies that:</p>
 <ul>
-<li>Any Istio custom resources that target that workload will have no effect.  There is no proxy to program.</li>
+<li>Istio Custom Resources applied, targeting that workload, will have no effect, as there is no proxy to program.</li>
 <li>The workload will not be considered a part of the mesh.  No service discovery information will be communicated to peer workloads.</li>
 </ul>
 <p>In specific circumstances, it could mean that communication between the workload and other mesh workloads will not function.</p>
@@ -892,7 +939,7 @@ If the count still shows "1", it means that no additional proxies were deployed.
 <p>It is important to realize that <code>istiod</code> has a constant line of communication with all of the Envoy's:  both gateways and sidecars.</p>
 <p>When we run <code>istioctl proxy-status</code> we get insight into all the proxies that <code>istiod</code> controls, and whether the latest configurations have been sent and synced with each proxy.</p>
 <p>A common issue is forgetting to upgrade the sidecars after an Istio upgrade.</p>
-<p>To illustrated the issue, let us upgrade Istio in place.</p>
+<p>To illustrate the issue, upgrade Istio in place.</p>
 <h3 id="upgrading-istio-and-dangling-sidecars">Upgrading Istio and "dangling" sidecars<a class="headerlink" href="#upgrading-istio-and-dangling-sidecars" title="Permanent link">&para;</a></h3>
 <p>Download a newer version of Istio, version 1.22.0:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://istio.io/downloadIstio<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="nv">ISTIO_VERSION</span><span class="o">=</span><span class="m">1</span>.22.0<span class="w"> </span>sh<span class="w"> </span>-
@@ -915,7 +962,7 @@ If the count still shows "1", it means that no additional proxies were deployed.
 <ol>
 <li>The Istio CLI was upgraded</li>
 <li>The control plane was also upgraded</li>
-<li>The ingress gateway component, running envoy, was also upgraded</li>
+<li>The ingress gateway component, running Envoy, was also upgraded</li>
 <li>However, note that there's still one proxy associated with the older version of Istio</li>
 </ol>
 <p>Get more information with:</p>

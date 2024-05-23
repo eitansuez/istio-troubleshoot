@@ -4,7 +4,7 @@ In the previous exploration we looked at issues relating to misconfiguration.
 
 In this exploration, we investigate issues with the data plane:  everything is configured correctly, but some traffic flow isn't functioning, and we need to find out why.
 
-We have ingress configured for the bookinfo application, routing requests to the `productpage` destination.
+Ingress is configured for the `bookinfo` application, routing requests to the `productpage` destination.
 
 Assuming the local cluster deployed with k3d in [setup](setup.md#kubernetes), the ingress gateway is reachable on localhost, port 80:
 
@@ -72,7 +72,7 @@ In its place, configure ingress for the `httpbin` workload:
 kubectl apply -f artifacts/data-plane/httpbin-gateway.yaml
 ```
 
-```yaml linenums="1" hl_lines="31-33"
+```yaml linenums="1" hl_lines="32-34"
 --8<-- "data-plane/httpbin-gateway.yaml"
 ```
 
@@ -98,19 +98,19 @@ Envoy's response flags provide insight into why a request to a target destinatio
 
 We are not restricted to inspecting the logs of the ingress gateway.  We can also check the logs of the Envoy sidecars.
 
-Tail the logs for the sidecar of the httpbin destination workload:
+Tail the logs for the sidecar of the `httpbin` destination workload:
 
 ```shell
 kubectl logs --follow deploy/httpbin -c istio-proxy
 ```
 
-Repeat the call to the httpbin 503 endpoint:
+Repeat the call to the `httpbin` "503" endpoint:
 
 ```shell
 curl http://$GATEWAY_IP/status/503
 ```
 
-You will see four inbound requests received by the sidecar, i.e. 3 retry attempts.
+You will see evidence of four inbound requests received by the sidecar, i.e. three retry attempts.
 
 ## Log levels
 
@@ -126,15 +126,15 @@ To view the log levels for each logger, run:
 istioctl proxy-config log -n istio-system deploy/istio-ingressgateway
 ```
 
-The log levels are: trace, debug, info, warning, error, critical, and off.
+The log levels are: `trace`, `debug`, `info`, `warning`, `error`, `critical`, and `off`.
 
-To set the log level for, say the wasm logger, to info:
+To set the log level for, say the wasm logger, to `info`:
 
 ```shell
 istioctl proxy-config log -n istio-system deploy/istio-ingressgateway --level wasm:info
 ```
 
-This can be useful for debugging wasm plugins (extensions).
+This can be useful for debugging wasm extensions.
 
 The output displays the updated logging levels for every logger for that Envoy instance.
 

@@ -1,6 +1,8 @@
 # Installation
 
-The Istio CLI provides a number of commands that relate to the installation of Istio.
+## Objective
+
+To explore troubleshooting and diagnostic commands associated with the installation of Istio.
 
 ## Precheck
 

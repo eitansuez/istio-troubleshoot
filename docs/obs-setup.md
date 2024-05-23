@@ -16,7 +16,7 @@ We will focus on the call graph visualizations that Kiali generates.
 
 Istio provides deployment manifests for each tool under the `samples/addons` folder in the Istio distribution.
 Each tool will be deployed to the `istio-system` namespace.
-In production, more work will be needed to properly deploy, and configure access to each tool.
+In production, more work is required to properly deploy, and configure access to each tool.
 
 ### Deploy Prometheus
 

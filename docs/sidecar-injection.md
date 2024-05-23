@@ -1,12 +1,14 @@
 # Sidecar Injection
 
-The Istio documentation contains [a guide on sidecar injection](https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/) that explains both:
+## Objective
 
-- the mechanism for configuring sidecar injection, and
-- the ways in which sidecar injection can be controlled.
+To explore troubleshooting issues relating to sidecar injection in Istio.
 
+## Introduction
 
-## Main lesson
+The Istio documentation contains [a guide on sidecar injection](https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/) that explains the mechanism for configuring sidecar injection, and ways in which sidecar injection can be controlled.
+
+### Main lesson
 
 The most important thing to understand about sidecar injection is that **it occurs at pod creation time**.
 
@@ -38,13 +40,13 @@ The above act is passive:  **nothing will happen until a pod is created in the `
 
 Either:
 
-- delete the pod and let the deployment create a new one in its place:
+- Delete the pod and let the deployment create a new one in its place:
 
     ```shell
     kubectl delete pod -l app=httpbin
     ```
 
-- submit a command to the kube api server to restart the deployment
+- Submit a command to the kube API server to restart the deployment:
 
     ```shell
     kubectl rollout restart deploy httpbin
@@ -147,11 +149,11 @@ Look for a green checkmark under the INJECTED column.
 
 ## Consequences of a missing sidecar
 
-Fundamentally, a missing sidecar means that all traffic in and out of the pod will not be governed by Istio.
+Fundamentally, a missing sidecar means that all traffic in and out of the pod will not be controlled by Istio.
 
 This implies that:
 
-- Any Istio custom resources that target that workload will have no effect.  There is no proxy to program.
+- Istio Custom Resources applied, targeting that workload, will have no effect, as there is no proxy to program.
 - The workload will not be considered a part of the mesh.  No service discovery information will be communicated to peer workloads.
 
 In specific circumstances, it could mean that communication between the workload and other mesh workloads will not function.
@@ -204,7 +206,7 @@ When we run `istioctl proxy-status` we get insight into all the proxies that `is
 
 A common issue is forgetting to upgrade the sidecars after an Istio upgrade.
 
-To illustrated the issue, let us upgrade Istio in place.
+To illustrate the issue, upgrade Istio in place.
 
 ### Upgrading Istio and "dangling" sidecars
 
@@ -242,7 +244,7 @@ What is going on here?
 
 1. The Istio CLI was upgraded
 1. The control plane was also upgraded
-1. The ingress gateway component, running envoy, was also upgraded
+1. The ingress gateway component, running Envoy, was also upgraded
 1. However, note that there's still one proxy associated with the older version of Istio
 
 Get more information with:

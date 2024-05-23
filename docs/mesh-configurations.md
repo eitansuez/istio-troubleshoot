@@ -1,6 +1,6 @@
 # Mesh Configurations
 
-This section explores the subject of troubleshooting mesh configurations, and what tools are at your disposal to validate and diagnose configuration-related issues.
+This section explores troubleshooting mesh configurations, and what tools are at your disposal to validate and diagnose configuration-related issues.
 
 ## Deploy the `bookinfo` sample application
 
@@ -21,10 +21,10 @@ kubectl label ns default istio-injection=enabled
 Deploy the bookinfo sample application to the `default` namespace:
 
 ```shell
-kubectl apply -f ~//istio-{{istio.version}}/samples/bookinfo/platform/kube/bookinfo.yaml
+kubectl apply -f istio-{{istio.version}}/samples/bookinfo/platform/kube/bookinfo.yaml
 ```
 
-The sample application consists of a half dozen deployments:  productpage-v1, ratings-v1, details-v1, and reviews-v[1,2,3].
+The sample application consists of a half dozen deployments:  `productpage-v1`, `ratings-v1`, `details-v1`, and `reviews-v[1,2,3]`.
 
 Verify that all workloads are running, and have sidecars:
 
@@ -37,11 +37,20 @@ kubectl get pod
 Focus on two Istio custom resources, located in the `artifacts/mesh-config` folder:
 
 - `dr-reviews.yaml`:  A [DestinationRule](https://istio.io/latest/docs/reference/config/networking/destination-rule/) that defines the subsets v1, v2, and v3 of the `reviews` service.
+
+    ```yaml linenums="1"
+    --8<-- "mesh-config/dr-reviews.yaml"
+    ```
+
 - `vs-reviews-v1.yaml`: A [VirtualService](https://istio.io/latest/docs/reference/config/networking/virtual-service/) that directs all traffic to the reviews service to the `v1` subset.
+
+    ```yaml linenums="1"
+    --8<-- "mesh-config/vs-reviews-v1.yaml"
+    ```
 
 ### Validate resources
 
-Istio provides a [command that perform basic validation](https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-validate) on Istio custom resources.
+Istio provides a [command to perform basic validation](https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-validate) on Istio custom resources.
 
 Run the `istioctl validate` against each of these files:
 
@@ -62,7 +71,7 @@ The command cannot catch mistakes made in referencing label keys or values, or r
 
 - `validate` will also catch a wrong enum name.  For example, try to validate a version of `dr-reviews` where the loadBalancer value of RANDOM is instead spelled using lowercase.
 
-Apply the destination rule and virtual service to the cluster:
+Apply the DestinationRule and VirtualService to the cluster:
 
 ```shell
 kubectl apply -f artifacts/mesh-config/dr-reviews.yaml
@@ -96,13 +105,13 @@ kubectl get destinationrule
 
 #### Did I reference the right namespace?
 
-This is a common "gotcha", though in this example we are targeting the default namespace, and it's unlikely we got this wrong.
+This is a common "gotcha", though in this example we are targeting the `default` namespace, and it's unlikely we got this wrong.
 
 #### Are references correct?
 
-The destination rule references a host.  Is the hostname spelled correctly?  If the host resides in a different namespace, the hostname should be fully qualified.
+The DestinationRule references a host.  Is the hostname spelled correctly?  If the host resides in a different namespace, the hostname should be fully qualified.
 
-The destination rule also references labels.  Are those labels correct?  They could be misspelled.
+The DestinationRule also references labels.  Are those labels correct?  They could be misspelled.
 
 We are also establishing a naming convention whereby each subset has the name v1, v2, and v3.
 
@@ -137,15 +146,17 @@ To get an idea of the variety of checks that the analyze command performs, follo
 
 In this instance we're warned of the invalid references.
 
-We will revisit the analyze command in subsequent example scenarios.
+We will revisit the `analyze` command in subsequent example scenarios.
 
 ### `istioctl x describe`
 
-The describe command is yet another useful way to independently verifying the configuration against the `reviews` service.
+The describe command is yet another useful way to independently verify the configuration against the `reviews` service.
 
 ```shell
 istioctl x describe svc reviews
 ```
+
+Here is the output:
 
 ```console
 Service: reviews
@@ -157,7 +168,7 @@ VirtualService: reviews
    1 HTTP route(s)
 ```
 
-The above output confirms that multiple subsets are defined, that a virtualservice is associated with the service in question, and that the load balancer policy was altered.
+The above output confirms that multiple subsets are defined, that a VirtualService is associated with the service in question, and that the load balancer policy was altered.
 
 ### Do we have the desired behavior?
 
@@ -170,13 +181,13 @@ kubectl exec deploy/sleep -- \
 
 Note the value of `podname` in each response.  It should have the prefix `reviews-v1`.
 
-That ultimately is the evidence we're looking for.
+That, ultimately, is the evidence we're looking for.
 
 ### Inspect the Envoy configuration
 
 We can ask the question:  how is `sleep` configured to route requests to the `reviews` service?
 
-We can ask Istio to show us the envoy configuration of the sidecar of the client, in this case `sleep`:
+We can ask Istio to show us the Envoy configuration of the sidecar of the client, in this case `sleep`:
 
 ```shell
 istioctl proxy-config routes deploy/sleep --name 9080 -o yaml
@@ -222,9 +233,11 @@ On line 19, the cluster reference is to the subset "v1".
 
 Understanding Envoy, how it's designed and configured, can go a long way to helping understand how to read these configuration files, and knowing where to look.
 
-Here is another example:  how can we verify that the load balancer policy specified in the destination rule has been applied?
+#### Another example
 
-That policy is associated with the destination service, which envoy calls a "cluster".
+How can we verify that the load balancer policy specified in the DestinationRule has been applied?
+
+That policy is associated with the destination service, which Envoy calls a "cluster".
 
 ```shell
 istioctl proxy-config cluster deploy/sleep --fqdn reviews.default.svc.cluster.local -o yaml | grep lbPolicy
@@ -243,15 +256,19 @@ The page titled [Debugging Envoy and Istiod](https://istio.io/latest/docs/ops/di
 
 ## Using the correct workload selector
 
-[Workload selectors](https://istio.io/latest/docs/reference/config/type/workload-selector/#WorkloadSelector) feature in the configuration of many Istio resources.  They are used to specify which envoy proxies to target, for different purposes.
+[Workload selectors](https://istio.io/latest/docs/reference/config/type/workload-selector/#WorkloadSelector) feature in the configuration of many Istio resources.  They are used to specify which Envoy proxies to target, for different purposes.
 
 For example, an [EnvoyFilter](https://istio.io/latest/docs/reference/config/networking/envoy-filter/) uses workload selectors to identify which proxies to program.
 An [AuthorizationPolicy](https://istio.io/latest/docs/reference/config/security/authorization-policy/) uses workload selectors to target the sidecars that control access to their workloads.
 
-Apply the following authorization policy, designed to allow only the `productpage` service to call the reviews service:
+Apply the following authorization policy, designed to allow only the `productpage` service to call the `reviews` service:
 
 ```shell
 kubectl apply -f artifacts/mesh-config/authz-policy-reviews.yaml
+```
+
+```yaml linenums="1"
+--8<-- "mesh-config/authz-policy-reviews.yaml"
 ```
 
 Verify that other workloads, say `sleep`, can now no longer call reviews:
@@ -339,12 +356,16 @@ The output is quite lengthy.  Here is the relevant portion, showing the [Envoy R
 
 ## Ingress Gateways
 
-Let's explore troubleshooting issues with ingress configuration.
+Explore troubleshooting issues with ingress configuration.
 
 Apply the following resource to the cluster:
 
 ```shell
 kubectl apply -f artifacts/mesh-config/bookinfo-gateway.yaml
+```
+
+```yaml linenums="1"
+--8<-- "mesh-config/bookinfo-gateway.yaml"
 ```
 
 `bookinfo-gateway.yaml` configures both a [Gateway](https://istio.io/latest/docs/reference/config/networking/gateway/) resource and a VirtualService to route incoming traffic to the `productpage` app.
@@ -365,7 +386,7 @@ There are many opportunities for misconfiguration:
 
 1. The Gateway selector that selects the ingress gateway.
 
-    If for example we get the selector wrong, running `istioctl analyze` will catch the invalid reference:
+    If for example we get the selector wrong (edit the value to "ingressgateways"), running `istioctl analyze` will catch the invalid reference:
 
     ```console
     Error [IST0101] (Gateway default/bookinfo-gateway) Referenced selector not found: "istio=ingressgateways"
@@ -373,6 +394,7 @@ There are many opportunities for misconfiguration:
 
 1. The VirtualService that references the gateway.
 
+    Edit the gateway name to "bookinfo-gateways".
     Here too `istioctl analyze` will catch the invalid reference:
 
     ```console

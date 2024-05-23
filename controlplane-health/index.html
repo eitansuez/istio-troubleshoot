@@ -470,28 +470,29 @@
 <h1 id="control-plane-health">Control plane Health<a class="headerlink" href="#control-plane-health" title="Permanent link">&para;</a></h1>
 <h2 id="todo">TODO<a class="headerlink" href="#todo" title="Permanent link">&para;</a></h2>
 <ul>
-<li>istiod logs</li>
-<li>istioctl admin log</li>
-<li>are there errors in the logs?</li>
-<li>metrics:<ul>
-<li>pilot error rate</li>
-<li>istio validation error rate</li>
-<li>sidecar injection error rate</li>
+<li><code>istiod</code> logs</li>
+<li><a href="https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-admin-log"><code>admin log</code> command</a></li>
+<li>Are there errors in the logs?</li>
+<li>Metrics:<ul>
+<li>Pilot error rate</li>
+<li>Istio validation error rate</li>
+<li>Sidecar injection error rate</li>
 </ul>
 </li>
 <li>
-<p>monitor the control plane - specific metrics to look for</p>
+<p>Monitor the control plane</p>
 <ul>
-<li>the istio control plane grafana dashboard</li>
+<li>Specific metrics to look for</li>
+<li>The Istio control plane grafana dashboard</li>
 </ul>
 </li>
 <li>
-<p>what governs how much work istio has to do?</p>
+<p>What governs how much work Istio has to do?</p>
 <ul>
-<li>number of running workloads / services</li>
-<li>frequency of deployment changes (adding, removing, updating)</li>
-<li>frequency of mesh configuration changes</li>
-<li>service discoverability scope (use sidecar resources)</li>
+<li>Number of running workloads / services</li>
+<li>Frequency of deployment changes (adding, removing, updating)</li>
+<li>Frequency of mesh configuration changes</li>
+<li>Service discoverability scope (use sidecar resources)</li>
 </ul>
 </li>
 </ul>

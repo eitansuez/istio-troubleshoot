@@ -445,6 +445,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Example scenario">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remedy-the-situation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remedy the situation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -762,6 +777,21 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Example scenario">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#remedy-the-situation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Remedy the situation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
       </ul>
@@ -827,7 +857,7 @@
 <p>This means that <em>if you configure a pod or a namespace for sidecar injection, it won't affect any pods that are already running</em>.</p>
 <h2 id="example">Example<a class="headerlink" href="#example" title="Permanent link">&para;</a></h2>
 <p>Deploy the <code>httpbin</code> workload to the default namespace:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>~/istio-1.21.2/samples/httpbin/httpbin.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>istio-1.21.2/samples/httpbin/httpbin.yaml
 </code></pre></div>
 <p>The simplest way to tell whether sidecar injection took place is to display the number containers running in the pod:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>kubectl<span class="w"> </span>get<span class="w"> </span>pod
@@ -870,9 +900,10 @@
 <h3 id="manual">Manual<a class="headerlink" href="#manual" title="Permanent link">&para;</a></h3>
 <p>The Istio CLI provides the <a href="https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-kube-inject"><code>kube-inject</code> command</a> to render the template against a deployment manifest.</p>
 <p>For example:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>istioctl<span class="w"> </span>kube-inject<span class="w"> </span>-f<span class="w"> </span>~/istio-1.21.2/samples/httpbin/httpbin.yaml<span class="w"> </span>&gt;<span class="w"> </span>injected.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>istioctl<span class="w"> </span>kube-inject<span class="w"> </span>-f<span class="w"> </span>istio-1.21.2/samples/httpbin/httpbin.yaml<span class="w"> </span>&gt;<span class="w"> </span>injected.yaml
 </code></pre></div>
 <p>Inspect the generated file <code>injected.yaml</code> and confirm that the deployment resource now specifies two containers.</p>
+<p>Contrast the original Deployment resource with the transformed, injected one.</p>
 <div class="admonition question">
 <p class="admonition-title">Question</p>
 <p>What name does Istio use for the sidecar container?</p>
@@ -920,7 +951,7 @@ If the count still shows "1", it means that no additional proxies were deployed.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>kubectl<span class="w"> </span>label<span class="w"> </span>ns<span class="w"> </span>default<span class="w"> </span>istio-injection-
 </code></pre></div>
 <p>Deploy the <code>sleep</code> sample, a convenience client from which to <code>curl</code> other workloads:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>~/istio-1.21.2/samples/sleep/sleep.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>istio-1.21.2/samples/sleep/sleep.yaml
 </code></pre></div>
 <p>Note that the <code>sleep</code> worklaod has no sidecar.</p>
 <p>Yet, we can still call <code>httpbin</code>:</p>
@@ -933,6 +964,22 @@ If the count still shows "1", it means that no additional proxies were deployed.
 <div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>deploy/sleep<span class="w"> </span>--<span class="w"> </span>curl<span class="w"> </span>httpbin:8000/get
 </code></pre></div>
 <p>The command fails with a <code>Connection reset by peer</code> error, because there is no forward proxy on <code>sleep</code> to upgrade the connection to mutual TLS, which is now a requirement.</p>
+<h4 id="remedy-the-situation">Remedy the situation<a class="headerlink" href="#remedy-the-situation" title="Permanent link">&para;</a></h4>
+<p>Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>istioctl<span class="w"> </span>proxy-status
+</code></pre></div>
+<p>Note that <code>sleep</code> is not on the list.</p>
+<p>Label the namespace once more, and restart the <code>sleep</code> deployment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>kubectl<span class="w"> </span>label<span class="w"> </span>ns<span class="w"> </span>default<span class="w"> </span>istio-injection<span class="o">=</span>enabled<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deploy<span class="w"> </span>sleep
+</code></pre></div>
+<p>Re-run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>istioctl<span class="w"> </span>proxy-status
+</code></pre></div>
+<p>And confirm that <code>sleep</code> is now listed as a proxy.</p>
+<p>Finally, call <code>httpbin</code> once more:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>kubectl<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>deploy/sleep<span class="w"> </span>--<span class="w"> </span>curl<span class="w"> </span>httpbin:8000/get
+</code></pre></div>
+<p>This time it succeeds.</p>
 <h2 id="sidecar-injection-problems">Sidecar injection problems<a class="headerlink" href="#sidecar-injection-problems" title="Permanent link">&para;</a></h2>
 <p>The Istio docs have a page titled <a href="https://istio.io/latest/docs/ops/common-problems/injection/">sidecar injection problems</a> that catalogs sidecar injection errors and their remedies.</p>
 <h2 id="communication-between-proxies-and-istiod">Communication between proxies and <code>istiod</code><a class="headerlink" href="#communication-between-proxies-and-istiod" title="Permanent link">&para;</a></h2>
@@ -942,39 +989,42 @@ If the count still shows "1", it means that no additional proxies were deployed.
 <p>To illustrate the issue, upgrade Istio in place.</p>
 <h3 id="upgrading-istio-and-dangling-sidecars">Upgrading Istio and "dangling" sidecars<a class="headerlink" href="#upgrading-istio-and-dangling-sidecars" title="Permanent link">&para;</a></h3>
 <p>Download a newer version of Istio, version 1.22.0:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://istio.io/downloadIstio<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="nv">ISTIO_VERSION</span><span class="o">=</span><span class="m">1</span>.22.0<span class="w"> </span>sh<span class="w"> </span>-
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>curl<span class="w"> </span>-L<span class="w"> </span>https://istio.io/downloadIstio<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="nv">ISTIO_VERSION</span><span class="o">=</span><span class="m">1</span>.22.0<span class="w"> </span>sh<span class="w"> </span>-
 </code></pre></div>
 <p>Replace the <code>istioctl</code> CLI in your PATH with the one from the new distribution.</p>
 <p>Verify that the Istio CLI version is now version 1.22.0:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="go">client version: 1.22.0</span>
-<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="go">control plane version: 1.21.2</span>
-<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="go">data plane version: 1.21.2 (2 proxies)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="go">client version: 1.22.0</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="go">control plane version: 1.21.2</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="go">data plane version: 1.21.2 (3 proxies)</span>
 </code></pre></div>
 <p>Upgrade Istio in-place:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>istioctl<span class="w"> </span>upgrade<span class="w"> </span>-f<span class="w"> </span>artifacts/install/trace-config.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>istioctl<span class="w"> </span>upgrade<span class="w"> </span>-f<span class="w"> </span>artifacts/install/trace-config.yaml
 </code></pre></div>
 <p>Re-run <code>istioctl version</code> and note the output:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="go">client version: 1.22.0</span>
-<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="go">control plane version: 1.22.0</span>
-<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="go">data plane version: 1.21.2 (1 proxies), 1.22.0 (1 proxies)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="go">client version: 1.22.0</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="go">control plane version: 1.22.0</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="go">data plane version: 1.21.2 (2 proxies), 1.22.0 (1 proxies)</span>
 </code></pre></div>
 <p>What is going on here?</p>
 <ol>
 <li>The Istio CLI was upgraded</li>
 <li>The control plane was also upgraded</li>
 <li>The ingress gateway component, running Envoy, was also upgraded</li>
-<li>However, note that there's still one proxy associated with the older version of Istio</li>
+<li>However, note that two proxies are still associated with the older version of Istio</li>
 </ol>
 <p>Get more information with:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>istioctl<span class="w"> </span>proxy-status
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>istioctl<span class="w"> </span>proxy-status
 </code></pre></div>
-<p>We can see that <code>httpbin</code> was left alone.  It still has a sidecar, but it's not associated with the new control plane.
+<p>We can see that <code>httpbin</code> and <code>sleep</code> were left alone.
+They still have a sidecar, but they are not associated with the new control plane.
 It's a sort of "orphaned" sidecar in that the new, updated Istio is not communicating with it.</p>
 <p>After an upgrade, it's important to be aware that the sidecars (the data plane) are not updated automatically.</p>
-<p>To update <code>httpbin</code>'s sidecar, restart the deployment:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deploy<span class="w"> </span>httpbin
+<p>To update <code>httpbin</code>'s and <code>sleep</code>'s sidecars, restart the deployments:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">for</span><span class="w"> </span>name<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="sb">`</span>kubectl<span class="w"> </span>get<span class="w"> </span>deploy<span class="w"> </span>-oname<span class="sb">`</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span>kubectl<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span><span class="nv">$name</span><span class="p">;</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="k">done</span>
 </code></pre></div>
-<p>Re-run <code>istioctl proxy-status</code> and verify that the <code>httpbin</code> sidecar is now associated with Istio version 1.22.0.</p>
+<p>Re-run <code>istioctl proxy-status</code> and verify that the <code>httpbin</code> and <code>sleep</code> sidecars are now associated with Istio version 1.22.0.</p>
 
 
 

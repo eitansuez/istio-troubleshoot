@@ -58,8 +58,16 @@ Run the `istioctl validate` against each of these files:
 istioctl validate -f artifacts/mesh-config/dr-reviews.yaml
 ```
 
+And:
+
 ```shell
 istioctl validate -f artifacts/mesh-config/vs-reviews-v1.yaml
+```
+
+It's handy to be able to validate all resources in the `mesh-config` folder:
+
+```shell
+istioctl validate -f artifacts/mesh-config
 ```
 
 We learn that the resource syntax is valid.
@@ -129,9 +137,9 @@ istioctl analyze
 
 There should be no issues.
 
-Edit the virtualservice and misspell the host field from `reviews` to, say, `reviewss`.
+Edit the virtualservice and misspell the destination host field from `reviews` to, say, `reviewss`.
 
-Apply the updated virtualservice to the cluster.
+Apply the updated VirtualService to the cluster.
 
 Re-run analyze.
 
@@ -142,9 +150,9 @@ Error: Analyzers found issues when analyzing namespace: default.
 See https://istio.io/v1.22/docs/reference/config/analysis for more information about causes and resolutions.
 ```
 
-To get an idea of the variety of checks that the analyze command performs, follow the [above suggested link](https://istio.io/latest/docs/reference/config/analysis/).
+To get an idea of the variety of checks that the `analyze` command performs, follow the [above suggested link](https://istio.io/latest/docs/reference/config/analysis/).
 
-In this instance we're warned of the invalid references.
+In this instance, we are warned of the invalid references.
 
 We will revisit the `analyze` command in subsequent example scenarios.
 
@@ -181,13 +189,18 @@ kubectl exec deploy/sleep -- \
 
 Note the value of `podname` in each response.  It should have the prefix `reviews-v1`.
 
+```shell
+kubectl exec deploy/sleep -- \
+  curl -s reviews.default.svc.cluster.local:9080/reviews/123  | jq .podname
+```
+
 That, ultimately, is the evidence we're looking for.
 
 ### Inspect the Envoy configuration
 
 We can ask the question:  how is `sleep` configured to route requests to the `reviews` service?
 
-We can ask Istio to show us the Envoy configuration of the sidecar of the client, in this case `sleep`:
+Ask Istio to show the Envoy configuration of the sidecar of the client, in this case `sleep`:
 
 ```shell
 istioctl proxy-config routes deploy/sleep --name 9080 -o yaml
@@ -249,6 +262,10 @@ There are four lbPolicies, one for each subset (v1, v2, v3, plus the top-level s
 In contrast, try to look at the lbPolicy configured in the `sleep` sidecar for the `httpbin` service.
 What lbPolicy is used for calls to that destination?
 
+```shell
+istioctl proxy-config cluster deploy/sleep --fqdn httpbin.default.svc.cluster.local -o yaml | grep lbPolicy
+```
+
 We will revisit the `istioctl proxy-config` command in subsequent scenarios.
 
 The page titled [Debugging Envoy and Istiod](https://istio.io/latest/docs/ops/diagnostic-tools/proxy-cmd/) does a great job of explaining the `istioctl proxy-config` command in more detail.
@@ -274,7 +291,7 @@ kubectl apply -f artifacts/mesh-config/authz-policy-reviews.yaml
 Verify that other workloads, say `sleep`, can now no longer call reviews:
 
 ```shell
-kubectl exec deploy/sleep -- curl -s http://reviews:9080/reviews/123
+kubectl exec deploy/sleep -- curl -s http://reviews:9080/reviews/123 | jq
 ```
 
 Was the request denied?
@@ -286,7 +303,8 @@ istioctl analyze
 ```
 
 ```console
-Warning [IST0127] (AuthorizationPolicy default/allowed-reviews-clients) No matching workloads for this resource with the following labels: app=reviewss
+Warning [IST0127] (AuthorizationPolicy default/allowed-reviews-clients)
+  No matching workloads for this resource with the following labels: app=reviewss
 ```
 
 Run the following command, which lists all authorization policies that applies to the reviews service:

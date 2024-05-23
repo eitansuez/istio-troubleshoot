@@ -81,7 +81,7 @@ The VirtualService is configured with three retry attempts in the event of a 503
 Call the `httpbin` endpoint that returns a 503:
 
 ```shell
-curl http://$GATEWAY_IP/status/503
+curl -v http://$GATEWAY_IP/status/503
 ```
 
 The Envoy gateway logs will show the response flag URX:  UpstreamRetryLimitExceeded:
@@ -107,7 +107,7 @@ kubectl logs --follow deploy/httpbin -c istio-proxy
 Repeat the call to the `httpbin` "503" endpoint:
 
 ```shell
-curl http://$GATEWAY_IP/status/503
+curl -v http://$GATEWAY_IP/status/503
 ```
 
 You will see evidence of four inbound requests received by the sidecar, i.e. three retry attempts.

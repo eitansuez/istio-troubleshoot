@@ -21,25 +21,25 @@ In production, more work is required to properly deploy, and configure access to
 ### Deploy Prometheus
 
 ```shell
-kubectl apply -f ~/istio-{{istio.version}}/samples/addons/prometheus.yaml
+kubectl apply -f istio-{{istio.version}}/samples/addons/prometheus.yaml
 ```
 
 ### Deploy Grafana
 
 ```shell
-kubectl apply -f ~/istio-{{istio.version}}/samples/addons/grafana.yaml
+kubectl apply -f istio-{{istio.version}}/samples/addons/grafana.yaml
 ```
 
 ### Deploy Zipkin
 
 ```shell
-kubectl apply -f ~/istio-{{istio.version}}/samples/addons/extras/zipkin.yaml
+kubectl apply -f istio-{{istio.version}}/samples/addons/extras/zipkin.yaml
 ```
 
 ### Deploy Kiali
 
 ```shell
-kubectl apply -f ~/istio-{{istio.version}}/samples/addons/kiali.yaml
+kubectl apply -f istio-{{istio.version}}/samples/addons/kiali.yaml
 ```
 
 Wait on each deployment to be ready.  Check on the workloads with:

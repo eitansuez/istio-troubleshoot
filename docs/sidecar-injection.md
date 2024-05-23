@@ -19,7 +19,7 @@ This means that _if you configure a pod or a namespace for sidecar injection, it
 Deploy the `httpbin` workload to the default namespace:
 
 ```shell
-kubectl apply -f ~/istio-{{istio.upgrade_from}}/samples/httpbin/httpbin.yaml
+kubectl apply -f istio-{{istio.upgrade_from}}/samples/httpbin/httpbin.yaml
 ```
 
 The simplest way to tell whether sidecar injection took place is to display the number containers running in the pod:

@@ -2,19 +2,19 @@
 
 ## TODO
 
-- istiod logs
-- istioctl admin log
-- are there errors in the logs?
-- metrics:
-    - pilot error rate
-    - istio validation error rate
-    - sidecar injection error rate
-- monitor the control plane - specific metrics to look for
-    - the istio control plane grafana dashboard
+- `istiod` logs
+- [`admin log` command](https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-admin-log)
+- Are there errors in the logs?
+- Metrics:
+    - Pilot error rate
+    - Istio validation error rate
+    - Sidecar injection error rate
+- Monitor the control plane
+    - Specific metrics to look for
+    - The Istio control plane grafana dashboard
 
-- what governs how much work istio has to do?
-    - number of running workloads / services
-    - frequency of deployment changes (adding, removing, updating)
-    - frequency of mesh configuration changes
-    - service discoverability scope (use sidecar resources)
-
+- What governs how much work Istio has to do?
+    - Number of running workloads / services
+    - Frequency of deployment changes (adding, removing, updating)
+    - Frequency of mesh configuration changes
+    - Service discoverability scope (use sidecar resources)

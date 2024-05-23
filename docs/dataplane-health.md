@@ -2,11 +2,11 @@
 
 ## TODO
 
-- call graph visualizations (kiali)
-- distributed trace visualizations to uncover latency issues
-- istio service & workload grafana dashboards
-- data plane metrics:
-    - high 4xx error rate
-    - high 5xx error rate
-    - high request latency
-    - latency 99 percentile
+- Call graph visualizations with Kiali
+- Distributed trace visualizations to uncover latency issues
+- Istio service & workload Grafana dashboards
+- Data plane metrics:
+    - High 4xx error rate
+    - High 5xx error rate
+    - High request latency
+    - Latency 99 percentile

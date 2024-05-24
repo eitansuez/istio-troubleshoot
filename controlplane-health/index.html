@@ -401,9 +401,42 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#todo" class="md-nav__link">
+  <a href="#logs" class="md-nav__link">
     <span class="md-ellipsis">
-      TODO
+      Logs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Logs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuring-log-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuring log levels
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dashboards" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dashboards
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-affects-istios-resource-utilization" class="md-nav__link">
+    <span class="md-ellipsis">
+      What affects Istio's resource utilization?
     </span>
   </a>
   
@@ -444,9 +477,42 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#todo" class="md-nav__link">
+  <a href="#logs" class="md-nav__link">
     <span class="md-ellipsis">
-      TODO
+      Logs
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Logs">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuring-log-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuring log levels
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dashboards" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dashboards
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-affects-istios-resource-utilization" class="md-nav__link">
+    <span class="md-ellipsis">
+      What affects Istio's resource utilization?
     </span>
   </a>
   
@@ -468,34 +534,260 @@
 
 
 <h1 id="control-plane-health">Control plane Health<a class="headerlink" href="#control-plane-health" title="Permanent link">&para;</a></h1>
-<h2 id="todo">TODO<a class="headerlink" href="#todo" title="Permanent link">&para;</a></h2>
+<p>Part of ensuring the health of the mesh includes ensuring the health of the control plane.
+That would be <code>istiod</code> and all of the activities it performs.</p>
+<h2 id="logs">Logs<a class="headerlink" href="#logs" title="Permanent link">&para;</a></h2>
+<p>We can tail the logs for <code>istiod</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>kubectl<span class="w"> </span>logs<span class="w"> </span>--follow<span class="w"> </span>-n<span class="w"> </span>istio-system<span class="w"> </span>deploy/istiod
+</code></pre></div>
+<p>Among other things, you should see lines reflecting activity such as pushing configuration to sidecars for different workloads.</p>
+<h3 id="configuring-log-levels">Configuring log levels<a class="headerlink" href="#configuring-log-levels" title="Permanent link">&para;</a></h3>
+<p>Similar to the <code>istioctl proxy-config log</code> command, Istio also provides a <a href="https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-admin-log">command for configuring logging for the controlplane</a>.</p>
+<p>Inspect the log level for each logger with:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>istioctl<span class="w"> </span>admin<span class="w"> </span>log
+</code></pre></div>
+<p>Alter the log level for a logger with the <code>--level</code> flag:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>istioctl<span class="w"> </span>admin<span class="w"> </span>log<span class="w"> </span>--level<span class="w"> </span>ads:warn
+</code></pre></div>
+<p>Unlike the log command for Envoys, the command will not echo back the update state of the loggers.</p>
+<p>To reset the log level, use the <code>--reset</code> flag:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>istioctl<span class="w"> </span>admin<span class="w"> </span>log<span class="w"> </span>--reset
+</code></pre></div>
+<h2 id="dashboards">Dashboards<a class="headerlink" href="#dashboards" title="Permanent link">&para;</a></h2>
+<p>In Grafana, the principal dashboard for monitoring the control plane is, as its name implies, the Control Plane dashboard.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>istioctl<span class="w"> </span>dashboard<span class="w"> </span>grafana
+</code></pre></div>
+<p>On the control plane dashboard, you will find information pertaining to:</p>
 <ul>
-<li><code>istiod</code> logs</li>
-<li><a href="https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-admin-log"><code>admin log</code> command</a></li>
-<li>Are there errors in the logs?</li>
-<li>Metrics:<ul>
-<li>Pilot error rate</li>
-<li>Istio validation error rate</li>
-<li>Sidecar injection error rate</li>
+<li>Resource usage for <code>istiod</code></li>
+<li>Frequency of pushes (of Envoy configurations)</li>
+<li>"Pilot" errors</li>
+<li>The number of services that Istio is connected to</li>
+<li>Number of connections to Envoys</li>
+<li>Times that connections were established</li>
+<li>The size of XDS requests and responses</li>
 </ul>
-</li>
-<li>
-<p>Monitor the control plane</p>
+<p>In addition, the Performance dashboard also contains (or repeats) resource usage for <code>istiod</code>, in addition to gateways and proxies.</p>
+<h2 id="what-affects-istios-resource-utilization">What affects Istio's resource utilization?<a class="headerlink" href="#what-affects-istios-resource-utilization" title="Permanent link">&para;</a></h2>
+<p>Istio recently switched to using the Delta XDS protocol, which is more efficient in comparison to the "state of the world" version, in terms of the amount of configuration that has to be communicated to each Envoy.</p>
+<p>The factors listed below affect Istio's resource usage:</p>
 <ul>
-<li>Specific metrics to look for</li>
-<li>The Istio control plane grafana dashboard</li>
+<li>the number of running workloads and services</li>
+<li>the frequency of deployment changes</li>
+<li>the frequency of mesh configuration changes</li>
+<li>the scope of service discoverability</li>
 </ul>
-</li>
-<li>
-<p>What governs how much work Istio has to do?</p>
+<p>The last item on the list is something we can do something about.</p>
+<p>By default, Istio programs all workloads with information about every other workload.</p>
+<p>In our sandbox environment, when we realize, for example, that:</p>
 <ul>
-<li>Number of running workloads / services</li>
-<li>Frequency of deployment changes (adding, removing, updating)</li>
-<li>Frequency of mesh configuration changes</li>
-<li>Service discoverability scope (use sidecar resources)</li>
+<li>httpbin doesn't need to know about all of the bookinfo services</li>
+<li><code>productpage</code> is the main service that calls most other <code>bookinfo</code> services</li>
 </ul>
-</li>
-</ul>
+<p>Through the <a href="https://istio.io/latest/docs/reference/config/networking/sidecar/">Sidecar resource</a>, we can communicate to Istio what services each workload needs to know about.</p>
+<p>This can go a long way to reducing Istio's footprint.</p>
+<p>Here is an example set of Sidecar resources that fine-tune the list of services that each deployment needs to know about:</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-5-1"> 1</a></span>
+<span class="normal"><a href="#__codelineno-5-2"> 2</a></span>
+<span class="normal"><a href="#__codelineno-5-3"> 3</a></span>
+<span class="normal"><a href="#__codelineno-5-4"> 4</a></span>
+<span class="normal"><a href="#__codelineno-5-5"> 5</a></span>
+<span class="normal"><a href="#__codelineno-5-6"> 6</a></span>
+<span class="normal"><a href="#__codelineno-5-7"> 7</a></span>
+<span class="normal"><a href="#__codelineno-5-8"> 8</a></span>
+<span class="normal"><a href="#__codelineno-5-9"> 9</a></span>
+<span class="normal"><a href="#__codelineno-5-10">10</a></span>
+<span class="normal"><a href="#__codelineno-5-11">11</a></span>
+<span class="normal"><a href="#__codelineno-5-12">12</a></span>
+<span class="normal"><a href="#__codelineno-5-13">13</a></span>
+<span class="normal"><a href="#__codelineno-5-14">14</a></span>
+<span class="normal"><a href="#__codelineno-5-15">15</a></span>
+<span class="normal"><a href="#__codelineno-5-16">16</a></span>
+<span class="normal"><a href="#__codelineno-5-17">17</a></span>
+<span class="normal"><a href="#__codelineno-5-18">18</a></span>
+<span class="normal"><a href="#__codelineno-5-19">19</a></span>
+<span class="normal"><a href="#__codelineno-5-20">20</a></span>
+<span class="normal"><a href="#__codelineno-5-21">21</a></span>
+<span class="normal"><a href="#__codelineno-5-22">22</a></span>
+<span class="normal"><a href="#__codelineno-5-23">23</a></span>
+<span class="normal"><a href="#__codelineno-5-24">24</a></span>
+<span class="normal"><a href="#__codelineno-5-25">25</a></span>
+<span class="normal"><a href="#__codelineno-5-26">26</a></span>
+<span class="normal"><a href="#__codelineno-5-27">27</a></span>
+<span class="normal"><a href="#__codelineno-5-28">28</a></span>
+<span class="normal"><a href="#__codelineno-5-29">29</a></span>
+<span class="normal"><a href="#__codelineno-5-30">30</a></span>
+<span class="normal"><a href="#__codelineno-5-31">31</a></span>
+<span class="normal"><a href="#__codelineno-5-32">32</a></span>
+<span class="normal"><a href="#__codelineno-5-33">33</a></span>
+<span class="normal"><a href="#__codelineno-5-34">34</a></span>
+<span class="normal"><a href="#__codelineno-5-35">35</a></span>
+<span class="normal"><a href="#__codelineno-5-36">36</a></span>
+<span class="normal"><a href="#__codelineno-5-37">37</a></span>
+<span class="normal"><a href="#__codelineno-5-38">38</a></span>
+<span class="normal"><a href="#__codelineno-5-39">39</a></span>
+<span class="normal"><a href="#__codelineno-5-40">40</a></span>
+<span class="normal"><a href="#__codelineno-5-41">41</a></span>
+<span class="normal"><a href="#__codelineno-5-42">42</a></span>
+<span class="normal"><a href="#__codelineno-5-43">43</a></span>
+<span class="normal"><a href="#__codelineno-5-44">44</a></span>
+<span class="normal"><a href="#__codelineno-5-45">45</a></span>
+<span class="normal"><a href="#__codelineno-5-46">46</a></span>
+<span class="normal"><a href="#__codelineno-5-47">47</a></span>
+<span class="normal"><a href="#__codelineno-5-48">48</a></span>
+<span class="normal"><a href="#__codelineno-5-49">49</a></span>
+<span class="normal"><a href="#__codelineno-5-50">50</a></span>
+<span class="normal"><a href="#__codelineno-5-51">51</a></span>
+<span class="normal"><a href="#__codelineno-5-52">52</a></span>
+<span class="normal"><a href="#__codelineno-5-53">53</a></span>
+<span class="normal"><a href="#__codelineno-5-54">54</a></span>
+<span class="normal"><a href="#__codelineno-5-55">55</a></span>
+<span class="normal"><a href="#__codelineno-5-56">56</a></span>
+<span class="normal"><a href="#__codelineno-5-57">57</a></span>
+<span class="normal"><a href="#__codelineno-5-58">58</a></span>
+<span class="normal"><a href="#__codelineno-5-59">59</a></span>
+<span class="normal"><a href="#__codelineno-5-60">60</a></span>
+<span class="normal"><a href="#__codelineno-5-61">61</a></span>
+<span class="normal"><a href="#__codelineno-5-62">62</a></span>
+<span class="normal"><a href="#__codelineno-5-63">63</a></span>
+<span class="normal"><a href="#__codelineno-5-64">64</a></span>
+<span class="normal"><a href="#__codelineno-5-65">65</a></span>
+<span class="normal"><a href="#__codelineno-5-66">66</a></span>
+<span class="normal"><a href="#__codelineno-5-67">67</a></span>
+<span class="normal"><a href="#__codelineno-5-68">68</a></span>
+<span class="normal"><a href="#__codelineno-5-69">69</a></span>
+<span class="normal"><a href="#__codelineno-5-70">70</a></span>
+<span class="normal"><a href="#__codelineno-5-71">71</a></span>
+<span class="normal"><a href="#__codelineno-5-72">72</a></span>
+<span class="normal"><a href="#__codelineno-5-73">73</a></span>
+<span class="normal"><a href="#__codelineno-5-74">74</a></span>
+<span class="normal"><a href="#__codelineno-5-75">75</a></span>
+<span class="normal"><a href="#__codelineno-5-76">76</a></span>
+<span class="normal"><a href="#__codelineno-5-77">77</a></span>
+<span class="normal"><a href="#__codelineno-5-78">78</a></span>
+<span class="normal"><a href="#__codelineno-5-79">79</a></span>
+<span class="normal"><a href="#__codelineno-5-80">80</a></span>
+<span class="normal"><a href="#__codelineno-5-81">81</a></span>
+<span class="normal"><a href="#__codelineno-5-82">82</a></span>
+<span class="normal"><a href="#__codelineno-5-83">83</a></span>
+<span class="normal"><a href="#__codelineno-5-84">84</a></span>
+<span class="normal"><a href="#__codelineno-5-85">85</a></span>
+<span class="normal"><a href="#__codelineno-5-86">86</a></span>
+<span class="normal"><a href="#__codelineno-5-87">87</a></span>
+<span class="normal"><a href="#__codelineno-5-88">88</a></span>
+<span class="normal"><a href="#__codelineno-5-89">89</a></span>
+<span class="normal"><a href="#__codelineno-5-90">90</a></span>
+<span class="normal"><a href="#__codelineno-5-91">91</a></span>
+<span class="normal"><a href="#__codelineno-5-92">92</a></span>
+<span class="normal"><a href="#__codelineno-5-93">93</a></span>
+<span class="normal"><a href="#__codelineno-5-94">94</a></span>
+<span class="normal"><a href="#__codelineno-5-95">95</a></span>
+<span class="normal"><a href="#__codelineno-5-96">96</a></span>
+<span class="normal"><a href="#__codelineno-5-97">97</a></span>
+<span class="normal"><a href="#__codelineno-5-98">98</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1"></a><span class="nn">---</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1beta1</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sidecar</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">productpage-sidecar</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8"></a><span class="w">  </span><span class="nt">workloadSelector</span><span class="p">:</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">productpage</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11"></a><span class="w">  </span><span class="nt">egress</span><span class="p">:</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;./reviews.default.svc.cluster.local&quot;</span>
+<a id="__codelineno-5-14" name="__codelineno-5-14"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;./details.default.svc.cluster.local&quot;</span>
+<a id="__codelineno-5-15" name="__codelineno-5-15"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;istio-system/*&quot;</span>
+<a id="__codelineno-5-16" name="__codelineno-5-16"></a><span class="nn">---</span>
+<a id="__codelineno-5-17" name="__codelineno-5-17"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1beta1</span>
+<a id="__codelineno-5-18" name="__codelineno-5-18"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sidecar</span>
+<a id="__codelineno-5-19" name="__codelineno-5-19"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-5-20" name="__codelineno-5-20"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews-v1-sidecar</span>
+<a id="__codelineno-5-21" name="__codelineno-5-21"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<a id="__codelineno-5-22" name="__codelineno-5-22"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-5-23" name="__codelineno-5-23"></a><span class="w">  </span><span class="nt">workloadSelector</span><span class="p">:</span>
+<a id="__codelineno-5-24" name="__codelineno-5-24"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-5-25" name="__codelineno-5-25"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews</span>
+<a id="__codelineno-5-26" name="__codelineno-5-26"></a><span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<a id="__codelineno-5-27" name="__codelineno-5-27"></a><span class="w">  </span><span class="nt">egress</span><span class="p">:</span>
+<a id="__codelineno-5-28" name="__codelineno-5-28"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-5-29" name="__codelineno-5-29"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;istio-system/*&quot;</span>
+<a id="__codelineno-5-30" name="__codelineno-5-30"></a><span class="nn">---</span>
+<a id="__codelineno-5-31" name="__codelineno-5-31"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1beta1</span>
+<a id="__codelineno-5-32" name="__codelineno-5-32"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sidecar</span>
+<a id="__codelineno-5-33" name="__codelineno-5-33"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-5-34" name="__codelineno-5-34"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews-v2-sidecar</span>
+<a id="__codelineno-5-35" name="__codelineno-5-35"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<a id="__codelineno-5-36" name="__codelineno-5-36"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-5-37" name="__codelineno-5-37"></a><span class="w">  </span><span class="nt">workloadSelector</span><span class="p">:</span>
+<a id="__codelineno-5-38" name="__codelineno-5-38"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-5-39" name="__codelineno-5-39"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews</span>
+<a id="__codelineno-5-40" name="__codelineno-5-40"></a><span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v2</span>
+<a id="__codelineno-5-41" name="__codelineno-5-41"></a><span class="w">  </span><span class="nt">egress</span><span class="p">:</span>
+<a id="__codelineno-5-42" name="__codelineno-5-42"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-5-43" name="__codelineno-5-43"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;./ratings.default.svc.cluster.local&quot;</span>
+<a id="__codelineno-5-44" name="__codelineno-5-44"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;istio-system/*&quot;</span>
+<a id="__codelineno-5-45" name="__codelineno-5-45"></a><span class="nn">---</span>
+<a id="__codelineno-5-46" name="__codelineno-5-46"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1beta1</span>
+<a id="__codelineno-5-47" name="__codelineno-5-47"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sidecar</span>
+<a id="__codelineno-5-48" name="__codelineno-5-48"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-5-49" name="__codelineno-5-49"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews-v3-sidecar</span>
+<a id="__codelineno-5-50" name="__codelineno-5-50"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<a id="__codelineno-5-51" name="__codelineno-5-51"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-5-52" name="__codelineno-5-52"></a><span class="w">  </span><span class="nt">workloadSelector</span><span class="p">:</span>
+<a id="__codelineno-5-53" name="__codelineno-5-53"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-5-54" name="__codelineno-5-54"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">reviews</span>
+<a id="__codelineno-5-55" name="__codelineno-5-55"></a><span class="w">      </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v3</span>
+<a id="__codelineno-5-56" name="__codelineno-5-56"></a><span class="w">  </span><span class="nt">egress</span><span class="p">:</span>
+<a id="__codelineno-5-57" name="__codelineno-5-57"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-5-58" name="__codelineno-5-58"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;./ratings.default.svc.cluster.local&quot;</span>
+<a id="__codelineno-5-59" name="__codelineno-5-59"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;istio-system/*&quot;</span>
+<a id="__codelineno-5-60" name="__codelineno-5-60"></a><span class="nn">---</span>
+<a id="__codelineno-5-61" name="__codelineno-5-61"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1beta1</span>
+<a id="__codelineno-5-62" name="__codelineno-5-62"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sidecar</span>
+<a id="__codelineno-5-63" name="__codelineno-5-63"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-5-64" name="__codelineno-5-64"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">details-sidecar</span>
+<a id="__codelineno-5-65" name="__codelineno-5-65"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<a id="__codelineno-5-66" name="__codelineno-5-66"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-5-67" name="__codelineno-5-67"></a><span class="w">  </span><span class="nt">workloadSelector</span><span class="p">:</span>
+<a id="__codelineno-5-68" name="__codelineno-5-68"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-5-69" name="__codelineno-5-69"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">details</span>
+<a id="__codelineno-5-70" name="__codelineno-5-70"></a><span class="w">  </span><span class="nt">egress</span><span class="p">:</span>
+<a id="__codelineno-5-71" name="__codelineno-5-71"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-5-72" name="__codelineno-5-72"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;istio-system/*&quot;</span>
+<a id="__codelineno-5-73" name="__codelineno-5-73"></a><span class="nn">---</span>
+<a id="__codelineno-5-74" name="__codelineno-5-74"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1beta1</span>
+<a id="__codelineno-5-75" name="__codelineno-5-75"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sidecar</span>
+<a id="__codelineno-5-76" name="__codelineno-5-76"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-5-77" name="__codelineno-5-77"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ratings-sidecar</span>
+<a id="__codelineno-5-78" name="__codelineno-5-78"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<a id="__codelineno-5-79" name="__codelineno-5-79"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-5-80" name="__codelineno-5-80"></a><span class="w">  </span><span class="nt">workloadSelector</span><span class="p">:</span>
+<a id="__codelineno-5-81" name="__codelineno-5-81"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-5-82" name="__codelineno-5-82"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ratings</span>
+<a id="__codelineno-5-83" name="__codelineno-5-83"></a><span class="w">  </span><span class="nt">egress</span><span class="p">:</span>
+<a id="__codelineno-5-84" name="__codelineno-5-84"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-5-85" name="__codelineno-5-85"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;istio-system/*&quot;</span>
+<a id="__codelineno-5-86" name="__codelineno-5-86"></a><span class="nn">---</span>
+<a id="__codelineno-5-87" name="__codelineno-5-87"></a><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">networking.istio.io/v1beta1</span>
+<a id="__codelineno-5-88" name="__codelineno-5-88"></a><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Sidecar</span>
+<a id="__codelineno-5-89" name="__codelineno-5-89"></a><span class="nt">metadata</span><span class="p">:</span>
+<a id="__codelineno-5-90" name="__codelineno-5-90"></a><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin-sidecar</span>
+<a id="__codelineno-5-91" name="__codelineno-5-91"></a><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+<a id="__codelineno-5-92" name="__codelineno-5-92"></a><span class="nt">spec</span><span class="p">:</span>
+<a id="__codelineno-5-93" name="__codelineno-5-93"></a><span class="w">  </span><span class="nt">workloadSelector</span><span class="p">:</span>
+<a id="__codelineno-5-94" name="__codelineno-5-94"></a><span class="w">    </span><span class="nt">labels</span><span class="p">:</span>
+<a id="__codelineno-5-95" name="__codelineno-5-95"></a><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">httpbin</span>
+<a id="__codelineno-5-96" name="__codelineno-5-96"></a><span class="w">  </span><span class="nt">egress</span><span class="p">:</span>
+<a id="__codelineno-5-97" name="__codelineno-5-97"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">hosts</span><span class="p">:</span>
+<a id="__codelineno-5-98" name="__codelineno-5-98"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;istio-system/*&quot;</span>
+</code></pre></div></td></tr></table></div>
+<p>Apply the sidecars to your cluster:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>artifacts/cp-health/sidecars.yaml
+</code></pre></div>
+<p>The control plane dashboard will show an XDS push that updates the sidecar configurations accordingly.</p>
+<p>In this sandbox environment with so few services, this hardly makes a difference.</p>
 
 
 
